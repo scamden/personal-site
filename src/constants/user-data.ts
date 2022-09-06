@@ -2,7 +2,7 @@ export const userData = {
   githubUsername: 'scamden',
   name: 'Sterling Camden',
   designation: 'Full-Stack Developer',
-  avatarUrl: '/avatar.png',
+  avatarUrl: '/me.png',
   email: 'manuarorawork@gmail.com',
   phone: '+91 9587738861',
   address: 'Jaipur, Rajasthan, India.',
