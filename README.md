@@ -1,34 +1,34 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# sterlingcamden.com
 
-## Getting Started
+Personal site for Sterling Camden. A quiet single page — who I am, what I'm thinking about,
+building, singing, and climbing on — with room to grow into podcast and writing sections.
 
-First, run the development server:
+Built with [TanStack Start](https://tanstack.com/start) (React 19 + Vite), TypeScript, and Biome.
+
+## Develop
 
 ```bash
-npm run dev
-# or
-yarn dev
+pnpm install
+pnpm dev        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Editing content
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+All copy lives in [`src/data/site.ts`](src/data/site.ts) — hero, sections, links, photo, social.
+Edit there, not in the JSX. The design system (colors, type, light/dark) lives as CSS custom
+properties in [`src/styles.css`](src/styles.css).
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+## Checks
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+```bash
+pnpm run check        # format check + typecheck + lint
+pnpm run format       # auto-fix format, imports, lint
+pnpm run find-unused  # knip
+```
 
-## Learn More
+## Build
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```bash
+pnpm build
+pnpm preview
+```

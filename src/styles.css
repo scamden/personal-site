@@ -1,0 +1,325 @@
+/* ============================================================
+   sterlingcamden.com — design "H"
+   quiet single page · statement hero · left-rail labels
+   grayer slate accent · system fonts · light + dark
+   ============================================================ */
+
+:root {
+  --serif: "Hoefler Text", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+
+  /* light tokens (default) */
+  --paper: #f6f7f8;
+  --ink: #14171a;
+  --accent: #41505e;
+  --muted: #7c8894;
+  --hair: #dbe0e3;
+  --body: #24292e;
+}
+
+/* dark tokens — applied via [data-theme], with a media fallback for no-JS */
+:root[data-theme="dark"] {
+  --paper: #121517;
+  --ink: #e7e9ea;
+  --accent: #93a6b4;
+  --muted: #7c8a95;
+  --hair: #2a3033;
+  --body: #c4cace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121517;
+    --ink: #e7e9ea;
+    --accent: #93a6b4;
+    --muted: #7c8a95;
+    --hair: #2a3033;
+    --body: #c4cace;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  -webkit-font-smoothing: antialiased;
+  transition:
+    background 0.4s ease,
+    color 0.4s ease;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ---- layout ---- */
+.band {
+  padding: clamp(56px, 8vw, 112px) 26px;
+}
+.wrap {
+  max-width: 840px;
+  margin: 0 auto;
+}
+
+.kicker {
+  font-family: var(--sans);
+  font-size: clamp(14px, 1.7vw, 16px);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0 0 clamp(28px, 4vw, 42px);
+}
+
+.hero {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(38px, 7.4vw, 90px);
+  line-height: 1.05;
+  letter-spacing: -0.022em;
+  margin: 0;
+  max-width: 15ch;
+  text-wrap: balance;
+  color: var(--ink);
+}
+.hero .b {
+  font-family: var(--sans);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.hero .acc {
+  color: var(--accent);
+}
+
+/* ---- sections (label rail) ---- */
+.sections {
+  margin: clamp(64px, 8vw, 108px) 0 0;
+}
+.sec {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 34px;
+  align-items: baseline;
+  margin: 0 0 clamp(40px, 5vw, 56px);
+}
+@media (max-width: 640px) {
+  .sec {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+.lbl {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0;
+}
+
+.body {
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.62;
+  margin: 0 0 12px;
+  color: var(--body);
+  max-width: 60ch;
+}
+.body:last-child {
+  margin-bottom: 0;
+}
+.body .acc {
+  color: var(--accent);
+}
+.note {
+  font-size: 15px;
+  color: var(--muted);
+}
+
+/* ---- resource lists (the growth pattern) ---- */
+.reslist {
+  margin: 20px 0 0;
+  max-width: 60ch;
+}
+.reslist .item {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: baseline;
+  padding: 11px 0;
+  border-top: 1px solid var(--hair);
+  font-family: var(--sans);
+  color: var(--ink);
+}
+.reslist .item:last-child {
+  border-bottom: 1px solid var(--hair);
+}
+.reslist .item .t {
+  font-size: 15px;
+  font-weight: 550;
+  letter-spacing: 0.01em;
+}
+.reslist .item .t .arw {
+  color: var(--muted);
+  font-weight: 400;
+}
+.reslist .item .m {
+  font-size: 12.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+.reslist a.item:hover .t,
+.reslist a.item:hover .t .arw {
+  color: var(--accent);
+}
+.reslist a.item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.reslist .item.soon {
+  color: var(--muted);
+}
+
+/* ---- photo plate ---- */
+.plate-row {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  margin: clamp(56px, 7vw, 88px) 0 0;
+  padding-top: 32px;
+  border-top: 1px solid var(--hair);
+}
+.plate {
+  width: 128px;
+  height: 150px;
+  flex: none;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.04);
+  border: 1px solid var(--hair);
+}
+:root[data-theme="dark"] .plate {
+  filter: grayscale(1) contrast(1.02) brightness(0.92);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .plate {
+    filter: grayscale(1) contrast(1.02) brightness(0.92);
+  }
+}
+.plate-cap {
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.plate-cap b {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-bottom: 3px;
+  font-weight: 700;
+}
+
+/* ---- closing invitation ---- */
+.invite {
+  font-family: var(--serif);
+  font-size: clamp(19px, 2.3vw, 25px);
+  line-height: 1.42;
+  color: var(--ink);
+  max-width: 26ch;
+  margin: clamp(56px, 7vw, 88px) 0 0;
+  padding-top: 32px;
+  border-top: 1px solid var(--hair);
+  text-wrap: balance;
+}
+
+/* ---- footer ---- */
+.foot {
+  font-family: var(--sans);
+  font-size: 14px;
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  margin-top: 20px;
+}
+.foot a {
+  color: var(--ink);
+  border-bottom: 1px solid var(--hair);
+}
+.foot a:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ---- theme toggle ---- */
+.theme-toggle {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 20;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--paper) 80%, transparent);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+}
+.theme-toggle:hover {
+  color: var(--ink);
+  border-color: var(--accent);
+}
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ---- subtle load motion (opt-in; content stays visible without it) ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: reveal 0.85s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  }
+  .reveal.d1 {
+    animation-delay: 0.08s;
+  }
+  .reveal.d2 {
+    animation-delay: 0.18s;
+  }
+  .reveal.d3 {
+    animation-delay: 0.28s;
+  }
+  .reveal.d4 {
+    animation-delay: 0.4s;
+  }
+  .reveal.d5 {
+    animation-delay: 0.52s;
+  }
+}
+@keyframes reveal {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
