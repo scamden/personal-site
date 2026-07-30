@@ -108,7 +108,7 @@ export const site = {
     {
       label: 'Moving',
       body: [
-        'Longboard surfing and bouldering, plus whatever rock is outside when I can reach it. Not especially good at either. That has never once been the point.',
+        'Snowboarding first, then climbing, then I gave climbing up to gamble on the ocean and fell hard for longboard surfing. Now I get to do both again. Anything outside and moving is the stuff.',
       ],
     },
   ] satisfies Section[],
