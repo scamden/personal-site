@@ -4,12 +4,15 @@
 export type HeroPiece = { t: string; b?: boolean; acc?: boolean };
 // no href => "coming soon"; metaHref => the meta becomes a second link (e.g. repo + live demo in one row)
 // inline => the title cell becomes several small links (e.g. a few merged fixes grouped in one row)
+// feature => this link is pulled out of the list into a featured card (blurb = the sentence shown);
+//   href is the "Source" link and metaHref is the primary "See it" demo link.
 export type ResourceLink = {
   title: string;
   meta: string;
   href?: string;
   metaHref?: string;
   inline?: { label: string; href: string }[];
+  feature?: string;
 };
 export type Section = {
   label: string;
@@ -79,16 +82,18 @@ export const site = {
     {
       label: 'Building',
       body: [
-        'I build software for a living and for the pleasure of it. I care about finding the true shape of a system and expressing it as simply as it allows. Below is some public work I’ve done. Some of it is mine, like a test-first, virtualized grid core I built by hand when a fast grid meant fighting the browsers and devices of the day, and it quietly powered RelateIQ, CreditIQ, and Airkit (I’m unreasonably proud of this old thing). A lot of it, though, lives in other people’s libraries, where I’ve gone in to fix a gnarly type or a subtle bug the maintainers hadn’t cornered yet. The best code says the right thing the simplest way.',
+        'I build software for a living and for the pleasure of it. I care about finding the true shape of a system and expressing it as simply as it allows. Below is some public work. Some of it is mine, like the grid below, which I’m unreasonably proud of. A lot of it, though, lives in other people’s libraries, where I’ve gone in to fix a gnarly type or a subtle bug the maintainers hadn’t cornered yet. The best code says the right thing the simplest way.',
         'I miss crafting the code by hand, now that the machines do the writing. But the work just moved up a level, the search for the pattern underneath is the same as it ever was, and honestly I’m hopeful about what’s coming.',
       ],
       links: [
         // repo + live demo share one row (metaHref renders the meta as a second link)
         {
-          title: 'gridgrid/grid',
+          title: 'the grid',
           meta: 'See it move',
           href: 'https://github.com/gridgrid/grid',
           metaHref: '/grid',
+          feature:
+            'A hand-built, test-first virtualized grid core from when a fast grid meant fighting the browsers of the day. It quietly powered RelateIQ, CreditIQ, and Airkit.',
         },
         {
           title: 'react-ts-form',

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
 
 import { ThemeToggle } from '#/components/theme-toggle.tsx';
@@ -212,6 +212,36 @@ function ResourceItem({ link }: { link: ResourceLink }) {
   );
 }
 
+// A single link promoted out of the list into a bordered card: a headline, a
+// one-line blurb, and two CTAs (the demo via metaHref, the source via href).
+function FeatureCard({ link }: { link: ResourceLink }) {
+  return (
+    <div className="feature">
+      <h3 className="feature-title">{link.title}</h3>
+      {link.feature ? <p className="feature-blurb">{link.feature}</p> : null}
+      <div className="feature-cta">
+        {link.metaHref ? (
+          <a className="feature-see" href={link.metaHref}>
+            {link.meta}{' '}
+            <span className="arw" aria-hidden="true">
+              →
+            </span>
+          </a>
+        ) : null}
+        {link.href ? (
+          <a className="feature-src" href={link.href} target="_blank" rel="noreferrer">
+            <LinkIcon href={link.href} />
+            Source{' '}
+            <span className="arw" aria-hidden="true">
+              ↗
+            </span>
+          </a>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 function Home() {
   return (
     <>
@@ -223,19 +253,6 @@ function Home() {
               {site.name}
               <span className="kicker-gen">{site.generation}</span>
             </p>
-            <nav className="topnav">
-              <Link to="/grid" search={{ mode: 'universe' }} className="topnav-link">
-                the grid
-              </Link>
-              <a
-                href="https://ear-trainer-ynb.pages.dev/"
-                target="_blank"
-                rel="noreferrer"
-                className="topnav-link"
-              >
-                ear trainer
-              </a>
-            </nav>
           </div>
 
           <h1 className="hero reveal d1">
@@ -248,27 +265,36 @@ function Home() {
           </h1>
 
           <div className="sections">
-            {site.sections.map((section) => (
-              <section className="sec reveal d2" key={section.label}>
-                <h2 className="lbl">{section.label}</h2>
-                <div>
-                  {section.body.map((paragraph) => (
-                    <p className="body" key={paragraph.slice(0, 32)}>
-                      {renderProse(paragraph)}
-                    </p>
-                  ))}
-                  {section.note ? <p className="body note">{section.note}</p> : null}
-                  {section.linksIntro ? <p className="links-intro">{section.linksIntro}</p> : null}
-                  {section.links ? (
-                    <div className="reslist">
-                      {section.links.map((link) => (
-                        <ResourceItem key={link.title} link={link} />
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </section>
-            ))}
+            {site.sections.map((section) => {
+              const featured = section.links?.filter((link: ResourceLink) => link.feature) ?? [];
+              const rows = section.links?.filter((link: ResourceLink) => !link.feature) ?? [];
+              return (
+                <section className="sec reveal d2" key={section.label}>
+                  <h2 className="lbl">{section.label}</h2>
+                  <div>
+                    {section.body.map((paragraph) => (
+                      <p className="body" key={paragraph.slice(0, 32)}>
+                        {renderProse(paragraph)}
+                      </p>
+                    ))}
+                    {section.note ? <p className="body note">{section.note}</p> : null}
+                    {featured.map((link) => (
+                      <FeatureCard key={link.title} link={link} />
+                    ))}
+                    {section.linksIntro ? (
+                      <p className="links-intro">{section.linksIntro}</p>
+                    ) : null}
+                    {rows.length ? (
+                      <div className="reslist">
+                        {rows.map((link) => (
+                          <ResourceItem key={link.title} link={link} />
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                </section>
+              );
+            })}
           </div>
 
           <div className="plate-row reveal d3">
