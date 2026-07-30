@@ -1,8 +1,9 @@
-// Everything on the page comes from here. Copy is placeholder until the content pass.
+// Everything on the page comes from here.
 // Hero is a list of pieces so any word(s) can be emphasized (bold sans) or accented (slate).
 
 export type HeroPiece = { t: string; b?: boolean; acc?: boolean };
-export type ResourceLink = { title: string; meta: string; href?: string }; // no href => "coming soon"
+// no href => "coming soon"; metaHref => the meta becomes a second link (e.g. repo + live demo in one row)
+export type ResourceLink = { title: string; meta: string; href?: string; metaHref?: string };
 export type Section = { label: string; body: string[]; note?: string; links?: ResourceLink[] };
 
 export const site = {
@@ -10,13 +11,13 @@ export const site = {
   url: 'https://sterlingcamden.com',
   seo: {
     title: 'Sterling Camden',
-    description: 'Sterling Camden. I debug software for a living, and belief for the love of it.',
+    description: 'Sterling Camden. I debug software for a living and belief for the love of it.',
   },
 
   hero: [
     { t: 'I ' },
     { t: 'debug', b: true },
-    { t: ' software for a living, and ' },
+    { t: ' software for a living and ' },
     { t: 'belief', b: true, acc: true },
     { t: ' for the love of it.' },
   ] satisfies HeroPiece[],
@@ -25,9 +26,10 @@ export const site = {
     {
       label: 'Thinking',
       body: [
-        // arc opener in Sterling's own words. Short version; the fuller story is "to be continued".
-        'I was an atheist who couldn’t stop drinking. One winter night on the porch I found myself saying out loud, over and over, “please don’t let me drink anymore.” Night by night it turned into “thank you that I’m not drinking,” and then “who am I talking to?” Within two weeks I knew something miraculous was happening, though I hardly dared believe it. It set me free, I’ve been sober since, and slowly I started seeing God in everything, from the wind to song lyrics. Now I’m trying to get precise about it.',
-        'Truth over tribe, possibility over certainty. I’d rather hold the real questions honestly than the tidy answers loosely. Lately: consciousness, the limits of logic, and whether “why is there anything?” is a real question or a sentence that parses.',
+        // thesis first, then the story, then what I'm chewing on now.
+        'A former atheist who came to faith as an adult, now trying to get precise about it. Truth over tribe, possibility over certainty. I’d rather hold the real questions honestly than the tidy answers loosely.',
+        'It started on a winter porch. I couldn’t stop drinking, and one night I found myself saying out loud, over and over, “please don’t let me drink anymore.” Night by night it became “thank you that I’m not drinking,” and then “who am I talking to?” Within two weeks I knew something miraculous was happening, though I hardly dared believe it. It set me free. That was nineteen years ago, and apart from one disastrous nine-month experiment in the middle, I’ve been sober ever since. Slowly, I started seeing God in everything, from the wind to song lyrics.',
+        'Lately I’m chewing on consciousness, the limits of logic, and whether “why is there anything?” is a real question or a sentence that parses.',
       ],
       note: 'A podcast about all this is coming. It’ll live here first.',
       links: [
@@ -42,15 +44,16 @@ export const site = {
     {
       label: 'Building',
       body: [
-        'I build software for a living and for the pleasure of it. What I care about is finding the true shape of a system and saying it as simply as it allows. Some of it is my own, like a test-first, virtualized grid core I built by hand back when that was genuinely hard, fast enough that it quietly powered RelateIQ, CreditIQ, and Airkit (I’m unreasonably proud of this old thing). A lot of it lives in other people’s libraries, where I’ve gone in to fix a gnarly type or a subtle bug the maintainers hadn’t cornered yet. The best code says the right thing the simplest way.',
+        'I build software for a living and for the pleasure of it. I care about finding the true shape of a system and expressing it as simply as it allows. Some of my work is mine end to end, like a test-first, virtualized grid core I built by hand long ago, when that was genuinely hard, fast enough that it quietly powered RelateIQ, CreditIQ, and Airkit (I’m unreasonably proud of this old thing). Most of it, though, lives in other people’s libraries, where I’ve gone in to fix a gnarly type or a subtle bug the maintainers hadn’t cornered yet. The best code says the right thing the simplest way.',
       ],
       links: [
+        // repo + live demo share one row (metaHref renders the meta as a second link)
         {
           title: 'gridgrid/grid',
-          meta: 'Test-first virtualized grid core',
+          meta: 'See it move',
           href: 'https://github.com/gridgrid/grid',
+          metaHref: '/grid',
         },
-        { title: 'See the grid move', meta: 'Live demo', href: '/grid' },
         {
           title: 'react-ts-form',
           meta: 'Core contributor',
@@ -76,7 +79,7 @@ export const site = {
     {
       label: 'Music',
       body: [
-        'I write songs, play guitar, and sing considerably more than I record, but some of it made it out into the world. I also sang in Stanford Talisman and directed it my senior year.',
+        'I write songs, play guitar, and sing considerably more than I record, but some of it made it out into the world. These days I mostly play in and lead worship, on electric guitar and vocals. I also sang in Stanford Talisman and directed it my senior year.',
       ],
       links: [
         {
@@ -97,7 +100,7 @@ export const site = {
       ],
     },
     {
-      label: 'Moving',
+      label: 'Movement',
       body: [
         'Snowboarding first, then climbing, then I gave climbing up to gamble on the ocean and fell hard for longboard surfing. Now I get to do both again. Anything outside and moving is the stuff.',
       ],
@@ -117,7 +120,6 @@ export const site = {
   social: [
     { label: 'Email', href: 'mailto:sterling.camden@gmail.com' },
     { label: 'GitHub', href: 'https://github.com/scamden' },
-    { label: 'X', href: 'https://twitter.com/scamden' },
     { label: 'LinkedIn', href: 'https://linkedin.com/in/scamden' },
   ],
 };
