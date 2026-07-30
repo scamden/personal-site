@@ -15,8 +15,8 @@ importers:
         specifier: latest
         version: 1.168.33(esbuild@0.28.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(rolldown@1.1.5)(vite@8.1.5(@types/node@22.20.1)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0))
       grid:
-        specifier: ^4.10.9
-        version: 4.10.9
+        specifier: ^4.12.0
+        version: 4.12.0
       react:
         specifier: ^19.2.0
         version: 19.2.8
@@ -1286,8 +1286,8 @@ packages:
   get-tsconfig@4.14.0:
     resolution: {integrity: sha512-yTb+8DXzDREzgvYmh6s9vHsSVCHeC0G3PI5bEXNBHtmshPnO+S5O7qgLEOn0I5QvMy6kpZN8K1NKGyilLb93wA==}
 
-  grid@4.10.9:
-    resolution: {integrity: sha512-FxkXSXomQ+lDraGV758Z2PSkI41u956nU7cRfh7I9UHk/pfGZ148CW7aoutN65SYgMi8GeYmDQxhuyg4O03upg==}
+  grid@4.12.0:
+    resolution: {integrity: sha512-Lky9wGXWDFZSuIx2jMuatHTCKMAKDKplqCntNbdvFeRwcxN+r4aMQ9D87+fPsHQ4E2QH+CM2haSGOmovsgDv9g==}
     engines: {node: '>=10'}
 
   h3@2.0.1-rc.20:
@@ -2844,7 +2844,7 @@ snapshots:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
-  grid@4.10.9:
+  grid@4.12.0:
     dependencies:
       capitalize: 0.5.0
       click-off: 0.2.1

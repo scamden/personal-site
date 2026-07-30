@@ -16,9 +16,10 @@
 .griddemo-canvas {
   position: absolute;
   inset: 0;
-  /* We own touch gestures (drag + flick) in JS, so tell the browser not to
-     claim them for native panning/zoom. Without this the touchmove handler
-     can't preventDefault and the page scrolls instead of the grid. */
+  /* The grid library owns touch gestures (drag + flick) and defaults an embedded
+     grid to touch-action: pan-x pan-y. This full-screen demo owns the whole
+     gesture instead, so the engine re-asserts `none` after build; this rule just
+     covers the pre-build moment. */
   touch-action: none;
 }
 
@@ -254,4 +255,17 @@
 .griddemo .grid-scroll-bar {
   background: rgba(150, 162, 172, 0.72);
   border-radius: 6px;
+}
+
+/* On touch-only devices the drag-driven interactions (column resize/reorder,
+   cell range-select) aren't wired up, and a tapped-cell highlight leads nowhere.
+   Hide those affordances so mobile doesn't imply gestures the grid can't perform.
+   Scroll + flick still work. `hover: none` keeps touch-laptops (mouse present)
+   on the full desktop affordances. */
+@media (hover: none) and (pointer: coarse) {
+  .griddemo-canvas .col-resize,
+  .griddemo-canvas .grid-selection,
+  .griddemo-canvas .grid-focus-decorator {
+    display: none;
+  }
 }
