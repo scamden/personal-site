@@ -98,6 +98,16 @@ export const site = {
           meta: 'Some solos and descants',
           href: 'https://music.apple.com/us/album/your-voice-above-the-storm/1516034944',
         },
+        {
+          title: 'Talisman · Amazing Grace',
+          meta: 'Live solo',
+          href: 'https://youtu.be/gUCZ4YdUFZQ',
+        },
+        {
+          title: 'Talisman · Motherless',
+          meta: 'Live solo',
+          href: 'https://youtu.be/KGSym6wicjQ',
+        },
       ],
     },
     {
