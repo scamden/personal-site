@@ -278,36 +278,10 @@ a {
 
 /* ---- featured work (a list row promoted to a card) ---- */
 .feature {
-  position: relative;
-  overflow: hidden;
   max-width: 60ch;
   margin: 24px 0 4px;
   padding: 22px 24px 22px;
   border: 1px solid var(--hair);
-}
-/* a faint grid, fading in from the right — evokes the thing without a screenshot */
-.feature-motif {
-  position: absolute;
-  inset: 0;
-  background-image:
-    repeating-linear-gradient(to right, var(--hair) 0 1px, transparent 1px 34px),
-    repeating-linear-gradient(to bottom, var(--hair) 0 1px, transparent 1px 34px);
-  opacity: 0.55;
-  -webkit-mask-image: linear-gradient(105deg, transparent 42%, #000 100%);
-  mask-image: linear-gradient(105deg, transparent 42%, #000 100%);
-  pointer-events: none;
-}
-.feature-main {
-  position: relative;
-}
-.feature-eyebrow {
-  font-family: var(--sans);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin: 0 0 9px;
 }
 .feature-title {
   font-family: var(--serif);

@@ -217,30 +217,26 @@ function ResourceItem({ link }: { link: ResourceLink }) {
 function FeatureCard({ link }: { link: ResourceLink }) {
   return (
     <div className="feature">
-      <div className="feature-motif" aria-hidden="true" />
-      <div className="feature-main">
-        <p className="feature-eyebrow">Featured</p>
-        <h3 className="feature-title">{link.title}</h3>
-        {link.feature ? <p className="feature-blurb">{link.feature}</p> : null}
-        <div className="feature-cta">
-          {link.metaHref ? (
-            <a className="feature-see" href={link.metaHref}>
-              {link.meta}{' '}
-              <span className="arw" aria-hidden="true">
-                →
-              </span>
-            </a>
-          ) : null}
-          {link.href ? (
-            <a className="feature-src" href={link.href} target="_blank" rel="noreferrer">
-              <LinkIcon href={link.href} />
-              Source{' '}
-              <span className="arw" aria-hidden="true">
-                ↗
-              </span>
-            </a>
-          ) : null}
-        </div>
+      <h3 className="feature-title">{link.title}</h3>
+      {link.feature ? <p className="feature-blurb">{link.feature}</p> : null}
+      <div className="feature-cta">
+        {link.metaHref ? (
+          <a className="feature-see" href={link.metaHref}>
+            {link.meta}{' '}
+            <span className="arw" aria-hidden="true">
+              →
+            </span>
+          </a>
+        ) : null}
+        {link.href ? (
+          <a className="feature-src" href={link.href} target="_blank" rel="noreferrer">
+            <LinkIcon href={link.href} />
+            Source{' '}
+            <span className="arw" aria-hidden="true">
+              ↗
+            </span>
+          </a>
+        ) : null}
       </div>
     </div>
   );
