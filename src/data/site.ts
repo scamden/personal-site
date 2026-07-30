@@ -20,7 +20,8 @@ export type Section = {
 };
 
 export const site = {
-  name: 'Sterling Camden V',
+  name: 'Sterling Camden',
+  generation: 'V', // the fifth — a quiet suffix in the wordmark, not part of the surname
   url: 'https://sterlingcamden.com',
   seo: {
     title: 'Sterling Camden',
