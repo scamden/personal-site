@@ -84,14 +84,24 @@ export const site = {
       ],
       links: [
         {
-          title: 'Max’s First Word',
-          meta: 'The duo',
-          href: 'https://soundcloud.com/maxs-first-word',
+          title: 'My Friend',
+          meta: 'Newer',
+          href: 'https://soundcloud.com/sterling-camden-261510100/my-friend',
         },
         {
-          title: 'Solo recordings',
+          title: 'All the Love You Gave',
+          meta: 'Newer',
+          href: 'https://soundcloud.com/sterling-camden-261510100/all-the-love-you-gave',
+        },
+        {
+          title: 'this is not a christian rock album',
           meta: 'Older, drunker songs',
-          href: 'https://soundcloud.com/sterling-camden-261510100',
+          href: 'https://soundcloud.com/sterling-camden-261510100/sets/this-is-not-a-christian-rock-album',
+        },
+        {
+          title: 'Max’s First Word · Bang! Said Max',
+          meta: 'The duo',
+          href: 'https://soundcloud.com/maxs-first-word/sets/bang-said-max',
         },
         {
           title: 'Stanford Talisman · Your Voice Above the Storm',
