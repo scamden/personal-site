@@ -111,6 +111,12 @@ a {
   color: var(--ink);
   margin: 0;
 }
+/* generational suffix (the fifth): present but stepped back so the surname reads clean */
+.kicker-gen {
+  margin-left: 0.5em;
+  font-weight: 500;
+  color: var(--muted);
+}
 
 .hero {
   font-family: var(--serif);

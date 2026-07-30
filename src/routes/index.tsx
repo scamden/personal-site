@@ -219,7 +219,10 @@ function Home() {
       <div className="band">
         <div className="wrap">
           <div className="masthead reveal">
-            <p className="kicker">{site.name}</p>
+            <p className="kicker">
+              {site.name}
+              <span className="kicker-gen">{site.generation}</span>
+            </p>
             <nav className="topnav">
               <Link to="/grid" search={{ mode: 'universe' }} className="topnav-link">
                 the grid
