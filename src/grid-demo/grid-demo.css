@@ -13,11 +13,56 @@
   inset: 0;
 }
 
-/* Make the grid's cells a seamless color field: no borders, no padding. */
-.griddemo .grid-cell {
-  border: 0 !important;
-  padding: 0 !important;
+/* Neutralize the library's cell chrome; we paint the inner element ourselves.
+   Two-class selector outranks the library's single-class .grid-cell rule. */
+.griddemo-canvas .grid-cell {
+  border: 0;
+  padding: 0;
   background: transparent;
+}
+
+/* --- data grid mode (a normal, nice SaaS table) --- */
+.griddemo-canvas.is-data {
+  background: #0e1114;
+  /* clear the title/back bar so the frozen header row doesn't collide with it */
+  top: 64px;
+}
+.dcell {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  line-height: 40px;
+  padding: 0 14px;
+  font-family: var(--sans);
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  color: #c4cace;
+  background: #0e1114;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(255, 255, 255, 0.045);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dcell.odd {
+  background: #12171c;
+}
+.dhead {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  line-height: 40px;
+  padding: 0 14px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8a929a;
+  background: #171d23;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 /* --- overlay UI --- */
@@ -130,4 +175,40 @@
   font-size: 12px;
   color: #7c8790;
   margin-top: 2px;
+}
+
+/* --- controls stack + Game of Life controls --- */
+.griddemo-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+.griddemo-life {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.griddemo-select,
+.griddemo-reset {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: #cdd3d8;
+  background: rgba(10, 12, 14, 0.6);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(231, 233, 234, 0.16);
+  border-radius: 999px;
+  padding: 9px 14px;
+  cursor: pointer;
+}
+.griddemo-select:hover,
+.griddemo-reset:hover {
+  color: #fff;
+  border-color: rgba(231, 233, 234, 0.4);
+}
+.griddemo-select:focus-visible,
+.griddemo-reset:focus-visible {
+  outline: 2px solid #8fa6b4;
+  outline-offset: 2px;
 }
