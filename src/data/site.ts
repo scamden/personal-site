@@ -127,18 +127,18 @@ export const site = {
     {
       label: 'Music',
       body: [
-        'I write songs, play guitar, and sing more than I record, but some of it made it out into the world. These days I sometimes play in and lead worship, on electric or acoustic guitar and vocals. I also sang in Stanford Talisman and directed it my senior year; that group, its people, and its music showed me what joy and goodness could look like, and let in some of my first light, even the Christian songs I found hard at the time.',
+        'I write songs, play guitar, and sing more than I record, but some of it made it out into the world. These days I sometimes play in and lead worship, on electric or acoustic guitar and vocals. I also sang in [Stanford Talisman](https://acappella.stanford.edu/talisman) and directed it my senior year; that group, its people, and its music showed me what joy and goodness could look like, and let in some of my first light, even the Christian songs I found hard at the time.',
       ],
       links: [
-        {
-          title: 'My Friend',
-          meta: 'Newer',
-          href: 'https://soundcloud.com/sterling-camden-261510100/my-friend',
-        },
         {
           title: 'All the Love You Gave',
           meta: 'Newer',
           href: 'https://soundcloud.com/sterling-camden-261510100/all-the-love-you-gave',
+        },
+        {
+          title: 'My Friend',
+          meta: 'Newer',
+          href: 'https://soundcloud.com/sterling-camden-261510100/my-friend',
         },
         {
           title: 'this is not a christian rock album',

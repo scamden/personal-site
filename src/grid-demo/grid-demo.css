@@ -8,6 +8,9 @@
   background: var(--paper);
   color: var(--ink);
   font-family: var(--sans);
+  /* floating overlay chips: opaque enough that muted text stays readable
+     over the vivid animated field, still soft with the backdrop blur */
+  --chip: color-mix(in srgb, var(--paper) 90%, transparent);
 }
 
 .griddemo-canvas {
@@ -105,9 +108,9 @@
 .griddemo-back {
   font-size: 13px;
   letter-spacing: 0.04em;
-  color: var(--muted);
+  color: var(--body);
   text-decoration: none;
-  background: color-mix(in srgb, var(--paper) 62%, transparent);
+  background: var(--chip);
   backdrop-filter: blur(6px);
   border: 1px solid var(--hair);
   border-radius: 999px;
@@ -124,7 +127,7 @@
 
 .griddemo-title {
   text-align: right;
-  background: color-mix(in srgb, var(--paper) 58%, transparent);
+  background: var(--chip);
   backdrop-filter: blur(12px);
   border-radius: 12px;
   padding: 8px 14px;
@@ -140,7 +143,7 @@
 .griddemo-title p {
   margin: 4px 0 0;
   font-size: 13px;
-  color: var(--muted);
+  color: var(--body);
 }
 
 .griddemo-bottom {
@@ -160,7 +163,7 @@
   font-weight: 600;
   letter-spacing: 0.03em;
   color: var(--body);
-  background: color-mix(in srgb, var(--paper) 62%, transparent);
+  background: var(--chip);
   backdrop-filter: blur(6px);
   border: 1px solid var(--hair);
   border-radius: 999px;
@@ -186,7 +189,7 @@
   text-align: right;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
-  background: color-mix(in srgb, var(--paper) 58%, transparent);
+  background: var(--chip);
   backdrop-filter: blur(12px);
   border-radius: 12px;
   padding: 12px 14px;
@@ -220,7 +223,7 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--body);
-  background: color-mix(in srgb, var(--paper) 62%, transparent);
+  background: var(--chip);
   backdrop-filter: blur(6px);
   border: 1px solid var(--hair);
   border-radius: 999px;
