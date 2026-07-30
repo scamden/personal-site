@@ -4,12 +4,15 @@
 export type HeroPiece = { t: string; b?: boolean; acc?: boolean };
 // no href => "coming soon"; metaHref => the meta becomes a second link (e.g. repo + live demo in one row)
 // inline => the title cell becomes several small links (e.g. a few merged fixes grouped in one row)
+// feature => this link is pulled out of the list into a featured card (blurb = the sentence shown);
+//   href is the "Source" link and metaHref is the primary "See it" demo link.
 export type ResourceLink = {
   title: string;
   meta: string;
   href?: string;
   metaHref?: string;
   inline?: { label: string; href: string }[];
+  feature?: string;
 };
 export type Section = {
   label: string;
@@ -85,10 +88,12 @@ export const site = {
       links: [
         // repo + live demo share one row (metaHref renders the meta as a second link)
         {
-          title: 'gridgrid/grid',
+          title: 'the grid',
           meta: 'See it move',
           href: 'https://github.com/gridgrid/grid',
           metaHref: '/grid',
+          feature:
+            'A hand-built, test-first virtualized grid core from when a fast grid meant fighting the browsers of the day. It quietly powered RelateIQ, CreditIQ, and Airkit.',
         },
         {
           title: 'react-ts-form',

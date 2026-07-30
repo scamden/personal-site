@@ -68,38 +68,10 @@ a {
   margin: 0 auto;
 }
 
-/* masthead: name, then a small nav row directly beneath it. left-aligned so
-   the two read as one unit. the row is the seed of a nav — more items join
-   when there are more pages. */
+/* masthead: just the wordmark today. A real nav returns here once there are
+   2+ destinations (poems, podcast) — a set worth navigating, not a lone link. */
 .masthead {
   margin: 0 0 clamp(28px, 4vw, 42px);
-}
-.masthead .kicker {
-  margin: 0 0 11px;
-}
-.topnav {
-  display: flex;
-  font-family: var(--sans);
-}
-.topnav-link {
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-  transition: color 0.2s;
-}
-/* middot between items — the quiet "this is a nav set" cue */
-.topnav-link + .topnav-link::before {
-  content: "·";
-  margin: 0 11px;
-  color: var(--muted);
-}
-.topnav-link:hover {
-  color: var(--accent);
-}
-.topnav-link:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 4px;
 }
 
 .kicker {
@@ -300,6 +272,86 @@ a {
 }
 .reslist .item .t-link:focus-visible,
 .reslist .item .m-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* ---- featured work (a list row promoted to a card) ---- */
+.feature {
+  position: relative;
+  overflow: hidden;
+  max-width: 60ch;
+  margin: 24px 0 4px;
+  padding: 22px 24px 22px;
+  border: 1px solid var(--hair);
+}
+/* a faint grid, fading in from the right — evokes the thing without a screenshot */
+.feature-motif {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(to right, var(--hair) 0 1px, transparent 1px 34px),
+    repeating-linear-gradient(to bottom, var(--hair) 0 1px, transparent 1px 34px);
+  opacity: 0.55;
+  -webkit-mask-image: linear-gradient(105deg, transparent 42%, #000 100%);
+  mask-image: linear-gradient(105deg, transparent 42%, #000 100%);
+  pointer-events: none;
+}
+.feature-main {
+  position: relative;
+}
+.feature-eyebrow {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 9px;
+}
+.feature-title {
+  font-family: var(--serif);
+  font-size: 27px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+.feature-blurb {
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--body);
+  margin: 0 0 16px;
+  max-width: 44ch;
+}
+.feature-cta {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+}
+.feature-see {
+  display: inline-flex;
+  align-items: center;
+  color: var(--accent);
+}
+.feature-see .arw {
+  margin-left: 3px;
+}
+.feature-src {
+  display: inline-flex;
+  align-items: center;
+  color: var(--muted);
+}
+.feature-src:hover,
+.feature-src:hover .licon {
+  color: var(--accent);
+}
+.feature-see:focus-visible,
+.feature-src:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
 }
