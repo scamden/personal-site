@@ -66,8 +66,9 @@ export const site = {
         },
         {
           title: 'ear-trainer',
-          meta: 'A little app',
+          meta: 'Play it',
           href: 'https://github.com/scamden/ear-trainer',
+          metaHref: 'https://ear-trainer-ynb.pages.dev/',
         },
         {
           title: 'github.com/scamden',
