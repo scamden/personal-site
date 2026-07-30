@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GridRouteImport } from './routes/grid'
+import { Route as PoemsRouteImport } from './routes/poems'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +23,40 @@ const GridRoute = GridRouteImport.update({
   path: '/grid',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PoemsRoute = PoemsRouteImport.update({
+  id: '/poems',
+  path: '/poems',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/grid': typeof GridRoute
+  '/poems': typeof PoemsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/grid': typeof GridRoute
+  '/poems': typeof PoemsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/grid': typeof GridRoute
+  '/poems': typeof PoemsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/grid'
+  fullPaths: '/' | '/grid' | '/poems'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/grid'
-  id: '__root__' | '/' | '/grid'
+  to: '/' | '/grid' | '/poems'
+  id: '__root__' | '/' | '/grid' | '/poems'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GridRoute: typeof GridRoute
+  PoemsRoute: typeof PoemsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +75,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GridRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/poems': {
+      id: '/poems'
+      path: '/poems'
+      fullPath: '/poems'
+      preLoaderRoute: typeof PoemsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GridRoute: GridRoute,
+  PoemsRoute: PoemsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
