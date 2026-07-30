@@ -5,7 +5,17 @@ import { ThemeToggle } from '#/components/theme-toggle.tsx';
 import type { GridEngine, GridMode, GridStats, LifePattern } from '#/grid-demo/engine.ts';
 import '#/grid-demo/grid-demo.css';
 
-export const Route = createFileRoute('/grid')({ component: GridDemo });
+const MODES = ['universe', 'life', 'data'] as const satisfies readonly GridMode[];
+
+// Persist the active tab in ?mode= so a reload (or a shared link) keeps it.
+function validateSearch(search: Record<string, unknown>): { mode: GridMode } {
+  const { mode } = search;
+  return {
+    mode: (MODES as readonly string[]).includes(mode as string) ? (mode as GridMode) : 'universe',
+  };
+}
+
+export const Route = createFileRoute('/grid')({ component: GridDemo, validateSearch });
 
 const PATTERNS: { value: LifePattern; label: string }[] = [
   { value: 'soup', label: 'Random soup' },
@@ -29,16 +39,19 @@ function subtitleFor(mode: GridMode): string {
 }
 
 function GridDemo() {
+  const { mode: initialMode } = Route.useSearch();
+  const navigate = Route.useNavigate();
+
   const canvasRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<GridEngine | null>(null);
   // The engine pulls these from refs every frame, so control never depends on
   // the engine promise having resolved yet.
-  const modeRef = useRef<GridMode>('universe');
+  const modeRef = useRef<GridMode>(initialMode);
   const patternRef = useRef<LifePattern>('soup');
   const resetRef = useRef(0);
   const sizeRef = useRef(SIZES[0]?.value ?? 5_000);
 
-  const [mode, setMode] = useState<GridMode>('universe');
+  const [mode, setMode] = useState<GridMode>(initialMode);
   const [pattern, setPattern] = useState<LifePattern>('soup');
   const [size, setSize] = useState(sizeRef.current);
   const [stats, setStats] = useState<GridStats | null>(null);
@@ -82,6 +95,8 @@ function GridDemo() {
   const handleMode = (next: GridMode) => {
     modeRef.current = next;
     setMode(next);
+    // replace (not push) so the tab buttons don't stack history entries.
+    navigate({ search: { mode: next }, replace: true });
   };
   const handlePattern = (next: LifePattern) => {
     patternRef.current = next;
