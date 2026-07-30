@@ -25,8 +25,8 @@ export const site = {
     {
       label: 'Thinking',
       body: [
-        // arc opener in Sterling's own words; swap "Jesus" for Christianity/faith/God if preferred.
-        'I was an atheist. Then I went all in on Jesus. Now I’m trying to get precise about it.',
+        // arc opener in Sterling's own words. Short version; the fuller story is "to be continued".
+        'I was an atheist who couldn’t stop drinking. One winter night on the porch I found myself saying out loud, over and over, “please don’t let me drink anymore.” Night by night it turned into “thank you that I’m not drinking,” and then “who am I talking to?” Within two weeks I knew something miraculous was happening, though I hardly dared believe it. It set me free, I’ve been sober since, and slowly I started seeing God in everything, from the wind to song lyrics. Now I’m trying to get precise about it.',
         'Truth over tribe, possibility over certainty. I’d rather hold the real questions honestly than the tidy answers loosely. Lately: consciousness, the limits of logic, and whether “why is there anything?” is a real question or a sentence that parses.',
       ],
       note: 'A podcast about all this is coming. It’ll live here first.',
@@ -85,7 +85,7 @@ export const site = {
         },
         {
           title: 'Solo recordings',
-          meta: 'Older songs',
+          meta: 'Older, drunker songs',
           href: 'https://soundcloud.com/sterling-camden-261510100',
         },
         {
