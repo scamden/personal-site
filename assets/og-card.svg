@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f6f7f8"/>
+  <!-- kicker -->
+  <text x="92" y="132" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="600"
+        letter-spacing="4" fill="#14171a">STERLING CAMDEN</text>
+
+  <!-- hero statement -->
+  <text x="90" y="308" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="500" fill="#14171a" letter-spacing="-1" xml:space="preserve">
+    <tspan>I </tspan><tspan font-family="Helvetica, Arial, sans-serif" font-weight="800" letter-spacing="-2">debug</tspan><tspan> software for</tspan>
+  </text>
+  <text x="90" y="398" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="500" fill="#14171a" letter-spacing="-1" xml:space="preserve">
+    <tspan>a living and </tspan><tspan font-family="Helvetica, Arial, sans-serif" font-weight="800" letter-spacing="-2" fill="#41505e">belief</tspan>
+  </text>
+  <text x="90" y="488" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="500" fill="#14171a" letter-spacing="-1" xml:space="preserve">
+    <tspan>for the love of it.</tspan>
+  </text>
+
+  <!-- url -->
+  <text x="92" y="574" font-family="Helvetica, Arial, sans-serif" font-size="21" font-weight="600"
+        letter-spacing="2" fill="#646f7a">sterlingcamden.com</text>
+</svg>

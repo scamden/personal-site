@@ -151,7 +151,10 @@ function ResourceItem({ link }: { link: ResourceLink }) {
                 {...(isExternal(l.href) ? { target: '_blank', rel: 'noreferrer' } : {})}
               >
                 <LinkIcon href={l.href} />
-                {l.label} <span className="arw">↗</span>
+                {l.label}{' '}
+                <span className="arw" aria-hidden="true">
+                  ↗
+                </span>
               </a>
             </span>
           ))}
@@ -178,7 +181,12 @@ function ResourceItem({ link }: { link: ResourceLink }) {
       <div className="item">
         <a className="t t-link" href={link.href} {...ext}>
           <LinkIcon href={link.href} />
-          {link.title} {external ? <span className="arw">↗</span> : null}
+          {link.title}{' '}
+          {external ? (
+            <span className="arw" aria-hidden="true">
+              ↗
+            </span>
+          ) : null}
         </a>
         <a className="m m-link" href={link.metaHref} {...metaExt}>
           <LinkIcon href={link.metaHref} />
@@ -192,7 +200,12 @@ function ResourceItem({ link }: { link: ResourceLink }) {
     <a className="item" href={link.href} {...ext}>
       <span className="t">
         <LinkIcon href={link.href} />
-        {link.title} {external ? <span className="arw">↗</span> : null}
+        {link.title}{' '}
+        {external ? (
+          <span className="arw" aria-hidden="true">
+            ↗
+          </span>
+        ) : null}
       </span>
       <span className="m">{link.meta}</span>
     </a>
@@ -234,7 +247,7 @@ function Home() {
           <div className="sections">
             {site.sections.map((section) => (
               <section className="sec reveal d2" key={section.label}>
-                <p className="lbl">{section.label}</p>
+                <h2 className="lbl">{section.label}</h2>
                 <div>
                   {section.body.map((paragraph) => (
                     <p className="body" key={paragraph.slice(0, 32)}>

@@ -12,6 +12,10 @@ TypeScript, Biome. One quiet single page today; room to grow into podcast/writin
 - `src/components/` — reusable components (kebab-case files, named exports).
 - `src/styles.css` — the whole design system as CSS custom properties (`--paper`, `--ink`,
   `--accent`, …) with light + dark token sets. Style through the tokens; never hardcode colors.
+- `assets/og-card.svg` — source for the social share image. It's the design tokens in raw SVG.
+  Edit it, then regenerate the served PNG:
+  `rsvg-convert -w 1200 -h 630 assets/og-card.svg -o public/og.png`. Keep the colors in sync with
+  the light `--paper`/`--ink`/`--accent`/`--muted` tokens.
 
 ## Core workflow
 

@@ -12,7 +12,7 @@
   --paper: #f6f7f8;
   --ink: #14171a;
   --accent: #41505e;
-  --muted: #7c8894;
+  --muted: #646f7a; /* 4.78:1 on --paper — clears WCAG AA for small text */
   --hair: #dbe0e3;
   --body: #24292e;
 }
