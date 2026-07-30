@@ -42,15 +42,15 @@ export const site = {
     {
       label: 'Building',
       body: [
-        'I build software for a living and for the pleasure of it. What I care about is finding the true shape of a system and saying it as simply as it allows. Some of it is my own, like a test-first, virtualized grid core I built by hand back when that was genuinely hard, fast enough that it quietly powered RelateIQ, CreditIQ, and Airkit. A lot of it lives in other people’s libraries, where I’ve gone in to fix a gnarly type or a subtle bug the maintainers hadn’t cornered yet. The best code says the right thing the simplest way.',
+        'I build software for a living and for the pleasure of it. What I care about is finding the true shape of a system and saying it as simply as it allows. Some of it is my own, like a test-first, virtualized grid core I built by hand back when that was genuinely hard, fast enough that it quietly powered RelateIQ, CreditIQ, and Airkit (I’m unreasonably proud of this old thing). A lot of it lives in other people’s libraries, where I’ve gone in to fix a gnarly type or a subtle bug the maintainers hadn’t cornered yet. The best code says the right thing the simplest way.',
       ],
       links: [
-        { title: 'See the grid move', meta: 'Live demo', href: '/grid' },
         {
           title: 'gridgrid/grid',
           meta: 'Test-first virtualized grid core',
           href: 'https://github.com/gridgrid/grid',
         },
+        { title: 'See the grid move', meta: 'Live demo', href: '/grid' },
         {
           title: 'react-ts-form',
           meta: 'Core contributor',
@@ -90,19 +90,9 @@ export const site = {
           href: 'https://soundcloud.com/sterling-camden-261510100',
         },
         {
-          title: 'Talisman · Amazing Grace',
-          meta: 'Live solo',
-          href: 'https://youtu.be/gUCZ4YdUFZQ',
-        },
-        {
-          title: 'Talisman · Motherless',
-          meta: 'Live solo',
-          href: 'https://youtu.be/KGSym6wicjQ',
-        },
-        {
-          title: 'Talisman · One By One',
-          meta: 'Descant',
-          href: 'https://music.apple.com/us/album/one-by-one/1516034944?i=1516034945',
+          title: 'Stanford Talisman · Your Voice Above the Storm',
+          meta: 'Some solos and descants',
+          href: 'https://music.apple.com/us/album/your-voice-above-the-storm/1516034944',
         },
       ],
     },

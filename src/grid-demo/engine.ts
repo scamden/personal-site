@@ -70,8 +70,11 @@ const NOTES = ['', '', 'Follow up', 'VIP', 'Expansion', 'Renewal call', 'Churn r
 
 const PALETTE_N = 256;
 const UNIVERSE_PALETTE = buildUniversePalette(PALETTE_N);
-const LIFE_ALIVE = '#7fd4e6';
-const LIFE_DEAD = '#0c0f13';
+// Life colors flip with the theme so the dead cells match the page background.
+const LIFE_ALIVE_DARK = '#7fd4e6';
+const LIFE_ALIVE_LIGHT = '#0e7490';
+const LIFE_DEAD_DARK = '#121517';
+const LIFE_DEAD_LIGHT = '#f6f7f8';
 
 function buildUniversePalette(n: number): string[] {
   const out: string[] = [];
@@ -83,6 +86,12 @@ function clampIndex(v: number, n: number): number {
 }
 function layoutFor(mode: GridMode): 'field' | 'data' {
   return mode === 'data' ? 'data' : 'field';
+}
+function currentIsDark(): boolean {
+  const t = document.documentElement.getAttribute('data-theme');
+  if (t === 'dark') return true;
+  if (t === 'light') return false;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
 }
 
 // --- deterministic fake data for the SaaS grid ---
@@ -246,6 +255,7 @@ export async function createGridEngine(
 
   const liveCells = new Map<HTMLElement, { r: number; c: number }>();
   let mode: GridMode = getMode();
+  let isDark = currentIsDark();
   let time = 0;
   let painted = 0;
   let uniTick = 0;
@@ -329,12 +339,16 @@ export async function createGridEngine(
   }
 
   function fieldColor(r: number, c: number): string {
-    if (mode === 'life') return board[idx(r, c)] === 1 ? LIFE_ALIVE : LIFE_DEAD;
+    if (mode === 'life') {
+      const alive = isDark ? LIFE_ALIVE_DARK : LIFE_ALIVE_LIGHT;
+      const dead = isDark ? LIFE_DEAD_DARK : LIFE_DEAD_LIGHT;
+      return board[idx(r, c)] === 1 ? alive : dead;
+    }
     const v =
       Math.sin(r * 0.06 + time) +
       Math.sin(c * 0.06 + time * 0.9) +
       Math.sin((r + c) * 0.045 + time * 0.5);
-    return UNIVERSE_PALETTE[clampIndex(((v / 6 + 0.5) * PALETTE_N) | 0, PALETTE_N)] ?? LIFE_DEAD;
+    return UNIVERSE_PALETTE[clampIndex(((v / 6 + 0.5) * PALETTE_N) | 0, PALETTE_N)] ?? '#000';
   }
   function recolorField() {
     for (const [el, pos] of liveCells) el.style.background = fieldColor(pos.r, pos.c);
@@ -427,6 +441,9 @@ export async function createGridEngine(
     for (let c = 0; c < g.colModel.length(); c++) g.colModel.get(c).builder = cellBuilder;
 
     const headerRow = g.rowModel.get(0);
+    // Let the library's reorder/resize handlers receive header drags instead of
+    // our custom header element swallowing them (enables drag-to-reorder columns).
+    headerRow.isBuiltActionable = false;
     headerRow.builder = g.rowModel.createBuilder(
       () => {
         const el = document.createElement('div');
@@ -493,6 +510,13 @@ export async function createGridEngine(
         fieldRows = size;
         buildFieldGrid();
       }
+    }
+
+    // theme flip: recolor the field immediately (data grid recolors via CSS)
+    const dark = currentIsDark();
+    if (dark !== isDark) {
+      isDark = dark;
+      if (layout === 'field') recolorField();
     }
 
     if (mode === 'life') {

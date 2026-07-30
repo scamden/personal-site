@@ -100,12 +100,13 @@ function GridDemo() {
       <div className="griddemo-canvas" ref={canvasRef} />
 
       <div className="griddemo-ui">
-        <ThemeToggle />
-
         <div className="griddemo-top">
-          <Link to="/" className="griddemo-back">
-            ← sterlingcamden.com
-          </Link>
+          <div className="griddemo-topleft">
+            <Link to="/" className="griddemo-back">
+              ← sterlingcamden.com
+            </Link>
+            <ThemeToggle />
+          </div>
           <div className="griddemo-title">
             <h1>gridgrid/grid</h1>
             <p>{subtitleFor(mode)}</p>
@@ -114,22 +115,6 @@ function GridDemo() {
 
         <div className="griddemo-bottom">
           <div className="griddemo-controls">
-            <div className="griddemo-modes">
-              <button
-                type="button"
-                data-on={mode === 'universe'}
-                onClick={() => handleMode('universe')}
-              >
-                Universe
-              </button>
-              <button type="button" data-on={mode === 'life'} onClick={() => handleMode('life')}>
-                Game of Life
-              </button>
-              <button type="button" data-on={mode === 'data'} onClick={() => handleMode('data')}>
-                Data grid
-              </button>
-            </div>
-
             {mode !== 'data' ? (
               <div className="griddemo-tools">
                 <select
@@ -166,6 +151,22 @@ function GridDemo() {
                 ) : null}
               </div>
             ) : null}
+
+            <div className="griddemo-modes">
+              <button
+                type="button"
+                data-on={mode === 'universe'}
+                onClick={() => handleMode('universe')}
+              >
+                Universe
+              </button>
+              <button type="button" data-on={mode === 'life'} onClick={() => handleMode('life')}>
+                Game of Life
+              </button>
+              <button type="button" data-on={mode === 'data'} onClick={() => handleMode('data')}>
+                Data grid
+              </button>
+            </div>
           </div>
 
           <div className="griddemo-readout">
