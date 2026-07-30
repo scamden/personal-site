@@ -154,7 +154,7 @@ a {
   display: flex;
   justify-content: space-between;
   gap: 18px;
-  align-items: baseline;
+  align-items: center;
   padding: 11px 0;
   border-top: 1px solid var(--hair);
   font-family: var(--sans);
@@ -188,6 +188,42 @@ a {
 }
 .reslist .item.soon {
   color: var(--muted);
+}
+
+/* destination icons + split (repo + demo) rows */
+.licon {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  margin-right: 9px;
+  color: var(--muted);
+}
+.reslist .item .t {
+  display: inline-flex;
+  align-items: center;
+}
+.reslist .item .t-link,
+.reslist .item .m-link {
+  text-decoration: none;
+}
+.reslist .item .t-link {
+  color: var(--ink);
+}
+.reslist .item .m-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--muted);
+}
+.reslist .item .t-link:hover,
+.reslist .item .m-link:hover,
+.reslist .item .t-link:hover .licon,
+.reslist .item .m-link:hover .licon {
+  color: var(--accent);
+}
+.reslist .item .t-link:focus-visible,
+.reslist .item .m-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
 }
 
 /* ---- photo plate ---- */
