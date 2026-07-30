@@ -346,7 +346,9 @@ a {
   line-height: 1.42;
   color: var(--ink);
   max-width: 26ch;
-  margin: clamp(40px, 5vw, 64px) 0 0;
+  /* match the plate-row's 32px padding-top so the author photo is inset
+     evenly between its top hairline and this one */
+  margin: 32px 0 0;
   padding-top: 28px;
   border-top: 1px solid var(--hair);
   text-wrap: balance;
