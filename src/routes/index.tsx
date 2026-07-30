@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
+import type { ReactNode } from 'react';
 
 import { ThemeToggle } from '#/components/theme-toggle.tsx';
 import { type HeroPiece, type ResourceLink, site } from '#/data/site.ts';
@@ -11,6 +12,33 @@ function heroClass(piece: HeroPiece): string | undefined {
 
 function isExternal(href: string): boolean {
   return href.startsWith('http');
+}
+
+// Render prose, turning inline [text](href) markdown links into anchors so the
+// copy stays the single source of truth. Plain strings pass through untouched.
+const INLINE_LINK = /\[([^\]]+)\]\(([^)]+)\)/g;
+function renderProse(text: string): ReactNode {
+  if (!text.includes('](')) return text;
+  const out: ReactNode[] = [];
+  let last = 0;
+  for (const m of text.matchAll(INLINE_LINK)) {
+    const start = m.index ?? 0;
+    if (start > last) out.push(text.slice(last, start));
+    const href = m[2] ?? '';
+    out.push(
+      <a
+        key={start}
+        className="prose-link"
+        href={href}
+        {...(isExternal(href) ? { target: '_blank', rel: 'noreferrer' } : {})}
+      >
+        {m[1]}
+      </a>,
+    );
+    last = start + m[0].length;
+  }
+  if (last < text.length) out.push(text.slice(last));
+  return out;
 }
 
 // Small monochrome marker to distinguish a link's destination.
@@ -63,6 +91,30 @@ function LinkIcon({ href }: { href: string }) {
     return (
       <svg className="licon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 8.83 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.31 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+      </svg>
+    );
+  }
+  if (href.startsWith('mailto:')) {
+    return (
+      <svg
+        className="licon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="m3 7 9 6 9-6" />
+      </svg>
+    );
+  }
+  if (href.includes('linkedin')) {
+    return (
+      <svg className="licon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M22.23 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.46c.98 0 1.77-.77 1.77-1.72V1.72C24 .77 23.21 0 22.23 0zM7.12 20.45H3.56V9h3.56v11.45zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67h-3.55V9h3.41v1.56h.05c.47-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28z" />
       </svg>
     );
   }
@@ -186,7 +238,7 @@ function Home() {
                 <div>
                   {section.body.map((paragraph) => (
                     <p className="body" key={paragraph.slice(0, 32)}>
-                      {paragraph}
+                      {renderProse(paragraph)}
                     </p>
                   ))}
                   {section.note ? <p className="body note">{section.note}</p> : null}
@@ -226,6 +278,7 @@ function Home() {
                 href={link.href}
                 {...(isExternal(link.href) ? { target: '_blank', rel: 'noreferrer' } : {})}
               >
+                <LinkIcon href={link.href} />
                 {link.label}
               </a>
             ))}
