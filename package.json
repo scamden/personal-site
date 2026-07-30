@@ -22,7 +22,7 @@
   "dependencies": {
     "@tanstack/react-router": "latest",
     "@tanstack/react-start": "latest",
-    "grid": "^4.10.9",
+    "grid": "^4.12.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
