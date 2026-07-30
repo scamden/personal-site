@@ -34,7 +34,9 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    // suppressHydrationWarning: the no-flash script sets data-theme on <html>
+    // before hydration, so its attributes intentionally differ from the SSR output.
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: static, first-paint theme script */}
         <script dangerouslySetInnerHTML={{ __html: NO_FLASH_THEME }} />
