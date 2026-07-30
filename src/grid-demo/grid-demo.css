@@ -13,6 +13,10 @@
 .griddemo-canvas {
   position: absolute;
   inset: 0;
+  /* We own touch gestures (drag + flick) in JS, so tell the browser not to
+     claim them for native panning/zoom. Without this the touchmove handler
+     can't preventDefault and the page scrolls instead of the grid. */
+  touch-action: none;
 }
 
 /* Neutralize the library's cell chrome; we paint the inner element ourselves.

@@ -483,6 +483,127 @@ export async function createGridEngine(
     recolorField();
   }
 
+  // --- touch scroll (prototype for a core-grid feature) ---
+  // The grid only ever consumed wheel events, so touchscreens couldn't scroll
+  // it. Wheel gets inertia for free (the OS keeps firing decaying wheel events
+  // after a trackpad flick); touch gets one touchend and silence, so we
+  // synthesize the flick ourselves and feed the same pixelScrollModel sink.
+  const unbindTouch = (() => {
+    const FRICTION = 0.95; // velocity kept per 16ms while a flick decays
+    const MIN_V = 0.02; // px/ms; below this the flick is done
+    // Release velocity is measured over a short trailing window of samples, not
+    // the single last move. Sample times come from the browser event timestamp,
+    // not performance.now() at handler time: the per-move handler repaints the
+    // grid and can lag the finger, so processing-time velocity understates a
+    // hard flick and misfires the "did they pause?" test. Event time is immune.
+    const VELOCITY_WINDOW_MS = 100;
+    let active = false;
+    let lastX = 0;
+    let lastY = 0;
+    let vx = 0; // px/ms release velocity, set at touchend
+    let vy = 0;
+    let flickRaf = 0;
+    let samples: { x: number; y: number; t: number }[] = [];
+
+    function stopFlick() {
+      if (flickRaf) cancelAnimationFrame(flickRaf);
+      flickRaf = 0;
+    }
+    // Move the grid by a pixel delta; returns whether it actually moved.
+    function scrollBy(dx: number, dy: number): { movedX: boolean; movedY: boolean } {
+      const pm = grid?.pixelScrollModel;
+      if (!pm) return { movedX: false, movedY: false };
+      const t0 = pm.top;
+      const l0 = pm.left;
+      pm.scrollTo(t0 - dy, l0 - dx);
+      return { movedX: pm.left !== l0, movedY: pm.top !== t0 };
+    }
+
+    function onStart(e: TouchEvent) {
+      if (e.touches.length !== 1) return; // let the browser pinch-zoom
+      stopFlick();
+      const t = e.touches[0];
+      if (!t) return;
+      active = true;
+      lastX = t.clientX;
+      lastY = t.clientY;
+      vx = 0;
+      vy = 0;
+      samples = [{ x: lastX, y: lastY, t: e.timeStamp }];
+    }
+    function onMove(e: TouchEvent) {
+      if (!active || e.touches.length !== 1) return;
+      const t = e.touches[0];
+      if (!t) return;
+      scrollBy(t.clientX - lastX, t.clientY - lastY);
+      lastX = t.clientX;
+      lastY = t.clientY;
+      samples.push({ x: lastX, y: lastY, t: e.timeStamp });
+      if (samples.length > 12) samples.shift();
+      e.preventDefault(); // we own this gesture; don't also scroll the page
+    }
+    // touchend and touchcancel both release here: iOS can fire touchcancel
+    // instead of touchend on a fast flick, and we still want the momentum.
+    function release(e: TouchEvent) {
+      if (!active) return;
+      active = false;
+      // Fold in the actual lift point and time: on a hard flick this captures
+      // the final motion; after a pre-lift pause the trailing window spans a
+      // big time gap with ~no displacement, so velocity comes out ~0 (a stop).
+      const lift = e.changedTouches[0];
+      if (lift) samples.push({ x: lift.clientX, y: lift.clientY, t: e.timeStamp });
+      const n = samples.length;
+      if (n < 2) return;
+      const newest = samples[n - 1];
+      if (!newest) return;
+      let i = n - 1;
+      while (i > 0) {
+        const prev = samples[i - 1];
+        if (!prev || newest.t - prev.t >= VELOCITY_WINDOW_MS) break;
+        i--;
+      }
+      const oldest = samples[i];
+      if (!oldest) return;
+      const wdt = newest.t - oldest.t;
+      vx = wdt > 0 ? (newest.x - oldest.x) / wdt : 0;
+      vy = wdt > 0 ? (newest.y - oldest.y) / wdt : 0;
+      if (Math.abs(vx) < MIN_V && Math.abs(vy) < MIN_V) return;
+      let prev = performance.now();
+      const step = (ts: number) => {
+        // rAF's timestamp is the already-started frame's time, so on frame 0 it
+        // can be <= the performance.now() we seeded prev with, giving dt<=0.
+        // dt=0 => scrollBy(0,0) => "didn't move" => the edge check kills the
+        // flick after one frame. Clamp to a real interval (and cap stalls).
+        const dt = Math.min(Math.max(ts - prev, 1), 50);
+        prev = ts;
+        const moved = scrollBy(vx * dt, vy * dt);
+        const decay = FRICTION ** (dt / 16);
+        vx *= decay;
+        vy *= decay;
+        if (!moved.movedX) vx = 0; // hit an edge: kill that axis
+        if (!moved.movedY) vy = 0;
+        if (Math.abs(vx) < MIN_V && Math.abs(vy) < MIN_V) {
+          flickRaf = 0;
+          return;
+        }
+        flickRaf = requestAnimationFrame(step);
+      };
+      flickRaf = requestAnimationFrame(step);
+    }
+
+    container.addEventListener('touchstart', onStart, { passive: false });
+    container.addEventListener('touchmove', onMove, { passive: false });
+    container.addEventListener('touchend', release);
+    container.addEventListener('touchcancel', release);
+    return () => {
+      stopFlick();
+      container.removeEventListener('touchstart', onStart);
+      container.removeEventListener('touchmove', onMove);
+      container.removeEventListener('touchend', release);
+      container.removeEventListener('touchcancel', release);
+    };
+  })();
+
   // --- animation loop ---
   let raf = 0;
   let last = 0;
@@ -557,6 +678,7 @@ export async function createGridEngine(
     stats: () => ({ fps, visible: painted, total, mode }),
     destroy: () => {
       cancelAnimationFrame(raf);
+      unbindTouch();
       teardown();
     },
   };
