@@ -119,7 +119,7 @@ export const site = {
   closing: 'Oh good, you’re here. Want to talk about reality? Because I really do.',
 
   social: [
-    { label: 'Email', href: 'mailto:sterling.camden@gmail.com' },
+    { label: 'Email', href: 'mailto:hello@sterlingcamden.com' },
     { label: 'GitHub', href: 'https://github.com/scamden' },
     { label: 'LinkedIn', href: 'https://linkedin.com/in/scamden' },
   ],
