@@ -405,6 +405,76 @@ a {
   outline-offset: 3px;
 }
 
+/* ---- 404 ---- */
+.nf {
+  min-height: 62vh;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 22px;
+}
+.nf-enso {
+  width: 84px;
+  height: 84px;
+  color: var(--muted);
+  transform-origin: center;
+}
+.nf-code {
+  font-family: var(--sans);
+  font-weight: 800;
+  font-size: clamp(40px, 9vw, 84px);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--ink);
+  margin: 0;
+}
+.nf-line {
+  font-family: var(--serif);
+  font-size: clamp(19px, 2.4vw, 26px);
+  line-height: 1.4;
+  color: var(--body);
+  max-width: 24ch;
+  margin: 0;
+  text-wrap: balance;
+}
+.nf-home {
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--hair);
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+}
+.nf-home:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .nf {
+    animation: nf-in 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .nf-enso {
+    animation: enso-spin 9s linear infinite;
+  }
+}
+@keyframes nf-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes enso-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* ---- subtle load motion (opt-in; content stays visible without it) ---- */
 @media (prefers-reduced-motion: no-preference) {
   .reveal {

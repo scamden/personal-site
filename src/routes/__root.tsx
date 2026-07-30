@@ -1,5 +1,6 @@
-import { createRootRoute, HeadContent, Scripts } from '@tanstack/react-router';
+import { createRootRoute, HeadContent, Link, Scripts } from '@tanstack/react-router';
 
+import { ThemeToggle } from '#/components/theme-toggle.tsx';
 import { site } from '#/data/site.ts';
 import appCss from '#/styles.css?url';
 
@@ -30,8 +31,41 @@ export const Route = createRootRoute({
       { rel: 'manifest', href: '/favicon/site.webmanifest' },
     ],
   }),
+  notFoundComponent: NotFound,
   shellComponent: RootDocument,
 });
+
+function NotFound() {
+  return (
+    <>
+      <ThemeToggle />
+      <div className="band">
+        <div className="wrap nf">
+          {/* an open ring (ensō with a gap): the unclosed question, turning */}
+          <svg className="nf-enso" viewBox="0 0 120 120" aria-hidden="true">
+            <circle
+              cx="60"
+              cy="60"
+              r="46"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeDasharray="250 39"
+            />
+          </svg>
+          <p className="nf-code">404</p>
+          <p className="nf-line">
+            Nothing here, which is a smaller mystery than why there’s anything anywhere.
+          </p>
+          <Link to="/" className="nf-home">
+            ← back to something
+          </Link>
+        </div>
+      </div>
+    </>
+  );
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
