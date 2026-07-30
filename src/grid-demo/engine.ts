@@ -428,7 +428,9 @@ export async function createGridEngine(
       (el, ctx) => {
         if (!el) return el;
         const dataRow = ctx.virtualRow - 1; // row 0 is the header
-        const col = ctx.virtualCol;
+        // Use the descriptor's stable data column, not the view position, so the
+        // data follows the column when the user drags to reorder.
+        const col = g.colModel.get(ctx.virtualCol).dataCol;
         const spec = DATA_COLS[col];
         el.textContent = cellText(dataRow, col);
         el.style.textAlign = spec?.align ?? 'left';
@@ -452,7 +454,7 @@ export async function createGridEngine(
       },
       (el, ctx) => {
         if (el) {
-          const spec = DATA_COLS[ctx.virtualCol];
+          const spec = DATA_COLS[g.colModel.get(ctx.virtualCol).dataCol];
           el.textContent = spec?.label ?? '';
           el.style.textAlign = spec?.align ?? 'left';
         }
