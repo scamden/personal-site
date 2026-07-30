@@ -145,6 +145,15 @@ a {
   color: var(--muted);
 }
 
+/* small lead-in above a resource list */
+.links-intro {
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--muted);
+  margin: 22px 0 -6px;
+  letter-spacing: 0.01em;
+}
+
 /* ---- resource lists (the growth pattern) ---- */
 .reslist {
   margin: 20px 0 0;
@@ -171,12 +180,32 @@ a {
 .reslist .item .t .arw {
   color: var(--muted);
   font-weight: 400;
+  margin-left: 4px;
 }
 .reslist .item .m {
   font-size: 12.5px;
   color: var(--muted);
   white-space: nowrap;
   letter-spacing: 0.02em;
+}
+
+/* row of several small links (e.g. grouped merged fixes) */
+.reslist .item .t.t-inline {
+  display: inline;
+  font-weight: 550;
+}
+.reslist .item .inline-link {
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+}
+.reslist .item .inline-link:hover,
+.reslist .item .inline-link:hover .arw {
+  color: var(--accent);
+}
+.reslist .item .inline-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 .reslist a.item:hover .t,
 .reslist a.item:hover .t .arw {

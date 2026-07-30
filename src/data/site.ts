@@ -3,8 +3,21 @@
 
 export type HeroPiece = { t: string; b?: boolean; acc?: boolean };
 // no href => "coming soon"; metaHref => the meta becomes a second link (e.g. repo + live demo in one row)
-export type ResourceLink = { title: string; meta: string; href?: string; metaHref?: string };
-export type Section = { label: string; body: string[]; note?: string; links?: ResourceLink[] };
+// inline => the title cell becomes several small links (e.g. a few merged fixes grouped in one row)
+export type ResourceLink = {
+  title: string;
+  meta: string;
+  href?: string;
+  metaHref?: string;
+  inline?: { label: string; href: string }[];
+};
+export type Section = {
+  label: string;
+  body: string[];
+  note?: string;
+  linksIntro?: string;
+  links?: ResourceLink[];
+};
 
 export const site = {
   name: 'Sterling Camden V',
@@ -27,24 +40,45 @@ export const site = {
       label: 'Thinking',
       body: [
         // thesis first, then the story, then what I'm chewing on now.
-        'A former atheist who came to faith as an adult, now trying to get precise about it. Truth over tribe, possibility over certainty. I’d rather hold the real questions honestly than the tidy answers loosely.',
-        'It started on a winter porch. I couldn’t stop drinking, and one night I found myself saying out loud, over and over, “please don’t let me drink anymore.” Night by night it became “thank you that I’m not drinking,” and then “who am I talking to?” Within two weeks I knew something miraculous was happening, though I hardly dared believe it. It set me free. That was nineteen years ago, and apart from one disastrous nine-month experiment in the middle, I’ve been sober ever since. Slowly, I started seeing God in everything, from the wind to song lyrics.',
-        'Lately I’m chewing on consciousness, the limits of logic, and whether “why is there anything?” is a real question or a sentence that parses.',
+        'A former atheist who came to faith as an adult, now trying to get precise about it. Truth over tribe, possibility over certainty. I’d rather hold the hard questions honestly than reach for tidy answers.',
+        'I fell hard into alcoholism in college and failed to quit more times than I can count. Then one desperate night, in the dead of winter on my mom’s back porch, I found myself saying out loud, over and over, “please don’t let me drink anymore.” Night by night it became “thank you that I’m not drinking.” Within two weeks I knew something miraculous was happening, though I hardly dared believe it. It set me free. That was nineteen years ago, and apart from one disastrous nine-month experiment two years in, I’ve been sober ever since. Slowly, I started seeing God in everything, from the wind to song lyrics. Eventually I went all in on Jesus, but that’s another story.',
+        'Lately I’m chewing on consciousness, the limits of logic, and what actually sits at the truest core of my Christian experience.',
       ],
       note: 'A podcast about all this is coming. It’ll live here first.',
+      linksIntro: 'A few voices I keep coming back to:',
       links: [
         {
           title: 'Alex O’Connor · CosmicSkeptic',
           meta: 'YouTube',
           href: 'https://www.youtube.com/@CosmicSkeptic',
         },
-        { title: 'The podcast · episode 01', meta: 'Coming soon' },
+        {
+          title: 'John Lennox',
+          meta: 'Site',
+          href: 'https://www.johnlennox.org/',
+        },
+        {
+          title: 'David Bentley Hart',
+          meta: 'Substack',
+          href: 'https://davidbentleyhart.substack.com/',
+        },
+        {
+          title: 'Donald Hoffman · is reality real?',
+          meta: 'StarTalk',
+          href: 'https://www.youtube.com/watch?v=GEtCYwr3quI',
+        },
+        {
+          title: 'Kurt Gödel · incompleteness',
+          meta: 'Encyclopedia',
+          href: 'https://plato.stanford.edu/entries/goedel/',
+        },
       ],
     },
     {
       label: 'Building',
       body: [
-        'I build software for a living and for the pleasure of it. I care about finding the true shape of a system and expressing it as simply as it allows. Some of my work is mine end to end, like a test-first, virtualized grid core I built by hand long ago, when that was genuinely hard, fast enough that it quietly powered RelateIQ, CreditIQ, and Airkit (I’m unreasonably proud of this old thing). Most of it, though, lives in other people’s libraries, where I’ve gone in to fix a gnarly type or a subtle bug the maintainers hadn’t cornered yet. The best code says the right thing the simplest way.',
+        'I build software for a living and for the pleasure of it. I care about finding the true shape of a system and expressing it as simply as it allows. Below is some public work I’ve done. Some of it is mine, like a test-first, virtualized grid core I built by hand when a fast grid meant fighting the browsers and devices of the day, and it quietly powered RelateIQ, CreditIQ, and Airkit (I’m unreasonably proud of this old thing). A lot of it, though, lives in other people’s libraries, where I’ve gone in to fix a gnarly type or a subtle bug the maintainers hadn’t cornered yet. The best code says the right thing the simplest way.',
+        'I miss crafting the code by hand, now that the machines do the writing. But the work just moved up a level, the search for the pattern underneath is the same as it ever was, and honestly I’m hopeful about what’s coming.',
       ],
       links: [
         // repo + live demo share one row (metaHref renders the meta as a second link)
@@ -62,7 +96,20 @@ export const site = {
         {
           title: 'jotai, mantine, webpack',
           meta: 'Merged fixes',
-          href: 'https://github.com/search?q=author%3Ascamden+is%3Apr+is%3Amerged&type=pullrequests',
+          inline: [
+            {
+              label: 'jotai',
+              href: 'https://github.com/pmndrs/jotai/pulls?q=is%3Apr+author%3Ascamden+is%3Amerged',
+            },
+            {
+              label: 'mantine',
+              href: 'https://github.com/mantinedev/mantine/pulls?q=is%3Apr+author%3Ascamden+is%3Amerged',
+            },
+            {
+              label: 'webpack',
+              href: 'https://github.com/webpack/webpack/pulls?q=is%3Apr+author%3Ascamden+is%3Amerged',
+            },
+          ],
         },
         {
           title: 'ear-trainer',
@@ -80,7 +127,7 @@ export const site = {
     {
       label: 'Music',
       body: [
-        'I write songs, play guitar, and sing considerably more than I record, but some of it made it out into the world. These days I mostly play in and lead worship, on electric guitar and vocals. I also sang in Stanford Talisman and directed it my senior year.',
+        'I write songs, play guitar, and sing more than I record, but some of it made it out into the world. These days I sometimes play in and lead worship, on electric or acoustic guitar and vocals. I also sang in Stanford Talisman and directed it my senior year; that group, its people, and its music showed me what joy and goodness could look like, and let in some of my first light, even the Christian songs I found hard at the time.',
       ],
       links: [
         {
@@ -121,7 +168,7 @@ export const site = {
       ],
     },
     {
-      label: 'Movement',
+      label: 'Outside',
       body: [
         'Snowboarding first, then climbing, then I gave climbing up to gamble on the ocean and fell hard for longboard surfing. Now I get to do both again. Anything outside and moving is the stuff.',
       ],

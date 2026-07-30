@@ -31,14 +31,22 @@ function LinkIcon({ href }: { href: string }) {
       </svg>
     );
   }
-  if (href.includes('soundcloud') || href.includes('music.apple')) {
+  if (href.includes('soundcloud')) {
+    // a little audio waveform
     return (
       <svg className="licon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M9 5 20 3 20 7 9 9Z" />
-        <rect x="7.4" y="5" width="1.6" height="12" />
-        <rect x="18.4" y="3" width="1.6" height="12" />
-        <circle cx="5" cy="17" r="3" />
-        <circle cx="16" cy="15" r="3" />
+        <rect x="3" y="12" width="2" height="6" rx="1" />
+        <rect x="7" y="9" width="2" height="9" rx="1" />
+        <rect x="11" y="5" width="2" height="13" rx="1" />
+        <rect x="15" y="8" width="2" height="10" rx="1" />
+        <rect x="19" y="11" width="2" height="7" rx="1" />
+      </svg>
+    );
+  }
+  if (href.includes('music.apple')) {
+    return (
+      <svg className="licon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 8.83 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.31 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
       </svg>
     );
   }
@@ -61,6 +69,29 @@ function LinkIcon({ href }: { href: string }) {
 }
 
 function ResourceItem({ link }: { link: ResourceLink }) {
+  // several small links grouped in one row (e.g. a handful of merged fixes)
+  if (link.inline) {
+    return (
+      <span className="item">
+        <span className="t t-inline">
+          {link.inline.map((l, i) => (
+            <span key={l.href}>
+              {i > 0 ? ', ' : ''}
+              <a
+                className="inline-link"
+                href={l.href}
+                {...(isExternal(l.href) ? { target: '_blank', rel: 'noreferrer' } : {})}
+              >
+                <LinkIcon href={l.href} />
+                {l.label} <span className="arw">↗</span>
+              </a>
+            </span>
+          ))}
+        </span>
+        <span className="m">{link.meta}</span>
+      </span>
+    );
+  }
   if (!link.href) {
     return (
       <span className="item soon">
@@ -128,6 +159,7 @@ function Home() {
                     </p>
                   ))}
                   {section.note ? <p className="body note">{section.note}</p> : null}
+                  {section.linksIntro ? <p className="links-intro">{section.linksIntro}</p> : null}
                   {section.links ? (
                     <div className="reslist">
                       {section.links.map((link) => (
