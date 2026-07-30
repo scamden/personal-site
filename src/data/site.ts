@@ -175,6 +175,12 @@ export const site = {
       ],
     },
     {
+      label: 'Poems',
+      body: [
+        'I’ve written poems since middle school and never quite stopped. I majored in it for a while too, half out of love and half to sharpen my songwriting, until computer science won out. A handful are [collected here](/poems).',
+      ],
+    },
+    {
       label: 'Outside',
       body: [
         'Snowboarding first, then climbing, then I gave climbing up to gamble on the ocean and fell hard for longboard surfing. Now I get to do both again. Anything outside and moving is the stuff.',

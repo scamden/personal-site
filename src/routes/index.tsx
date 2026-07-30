@@ -1,44 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router';
-import type { ReactNode } from 'react';
 
 import { ThemeToggle } from '#/components/theme-toggle.tsx';
 import { type HeroPiece, type ResourceLink, site } from '#/data/site.ts';
+import { isExternal, renderProse } from '#/lib/prose.tsx';
 
 export const Route = createFileRoute('/')({ component: Home });
 
 function heroClass(piece: HeroPiece): string | undefined {
   return [piece.b && 'b', piece.acc && 'acc'].filter(Boolean).join(' ') || undefined;
-}
-
-function isExternal(href: string): boolean {
-  return href.startsWith('http');
-}
-
-// Render prose, turning inline [text](href) markdown links into anchors so the
-// copy stays the single source of truth. Plain strings pass through untouched.
-const INLINE_LINK = /\[([^\]]+)\]\(([^)]+)\)/g;
-function renderProse(text: string): ReactNode {
-  if (!text.includes('](')) return text;
-  const out: ReactNode[] = [];
-  let last = 0;
-  for (const m of text.matchAll(INLINE_LINK)) {
-    const start = m.index ?? 0;
-    if (start > last) out.push(text.slice(last, start));
-    const href = m[2] ?? '';
-    out.push(
-      <a
-        key={start}
-        className="prose-link"
-        href={href}
-        {...(isExternal(href) ? { target: '_blank', rel: 'noreferrer' } : {})}
-      >
-        {m[1]}
-      </a>,
-    );
-    last = start + m[0].length;
-  }
-  if (last < text.length) out.push(text.slice(last));
-  return out;
 }
 
 // Small monochrome marker to distinguish a link's destination.
