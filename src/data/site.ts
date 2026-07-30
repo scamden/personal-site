@@ -7,7 +7,7 @@ export type ResourceLink = { title: string; meta: string; href?: string; metaHre
 export type Section = { label: string; body: string[]; note?: string; links?: ResourceLink[] };
 
 export const site = {
-  name: 'Sterling Camden',
+  name: 'Sterling Camden V',
   url: 'https://sterlingcamden.com',
   seo: {
     title: 'Sterling Camden',
