@@ -45,6 +45,7 @@ export const site = {
         'I build software for a living and for the pleasure of it. What I care about is finding the true shape of a system and saying it as simply as it allows. Some of it is my own, like a test-first, virtualized grid core I built by hand back when that was genuinely hard, fast enough that it quietly powered RelateIQ, CreditIQ, and Airkit. A lot of it lives in other people’s libraries, where I’ve gone in to fix a gnarly type or a subtle bug the maintainers hadn’t cornered yet. The best code says the right thing the simplest way.',
       ],
       links: [
+        { title: 'See the grid move', meta: 'Live demo', href: '/grid' },
         {
           title: 'gridgrid/grid',
           meta: 'Test-first virtualized grid core',

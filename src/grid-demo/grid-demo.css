@@ -22,10 +22,12 @@
 }
 
 /* --- data grid mode (a normal, nice SaaS table) --- */
+/* Theme-aware via the site tokens, so the theme toggle flips it light/dark.
+   Framed between the top bar and the bottom controls. */
 .griddemo-canvas.is-data {
-  background: #0e1114;
-  /* clear the title/back bar so the frozen header row doesn't collide with it */
-  top: 64px;
+  background: var(--paper);
+  top: 92px;
+  bottom: 74px;
 }
 .dcell {
   position: absolute;
@@ -36,16 +38,16 @@
   font-family: var(--sans);
   font-size: 13px;
   letter-spacing: 0.01em;
-  color: #c4cace;
-  background: #0e1114;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  border-right: 1px solid rgba(255, 255, 255, 0.045);
+  color: var(--body);
+  background: var(--paper);
+  border-bottom: 1px solid var(--hair);
+  border-right: 1px solid var(--hair);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .dcell.odd {
-  background: #12171c;
+  background: color-mix(in srgb, var(--paper) 92%, var(--ink));
 }
 .dhead {
   position: absolute;
@@ -58,9 +60,9 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #8a929a;
-  background: #171d23;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--muted);
+  background: color-mix(in srgb, var(--paper) 84%, var(--ink));
+  border-bottom: 1px solid var(--hair);
   white-space: nowrap;
   overflow: hidden;
 }
@@ -201,6 +203,35 @@
   border-radius: 999px;
   padding: 9px 14px;
   cursor: pointer;
+}
+/* custom caret so it isn't jammed against the right edge */
+.griddemo-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 32px;
+  background-color: rgba(10, 12, 14, 0.6);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23cdd3d8' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 13px center;
+}
+.griddemo-tools {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* make the library's scroll bar visible on both dark field and light table */
+.griddemo .grid-scroll-bar {
+  background: rgba(150, 162, 172, 0.72);
+  border-radius: 6px;
+}
+
+/* reposition the shared theme toggle so it clears the title on this page */
+.griddemo .theme-toggle {
+  top: 64px;
+  left: 22px;
+  right: auto;
 }
 .griddemo-select:hover,
 .griddemo-reset:hover {

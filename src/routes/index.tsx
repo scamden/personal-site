@@ -22,14 +22,15 @@ function ResourceItem({ link }: { link: ResourceLink }) {
       </span>
     );
   }
+  const external = isExternal(link.href);
   return (
     <a
       className="item"
       href={link.href}
-      {...(isExternal(link.href) ? { target: '_blank', rel: 'noreferrer' } : {})}
+      {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}
     >
       <span className="t">
-        {link.title} <span className="arw">↗</span>
+        {link.title} <span className="arw">{external ? '↗' : '→'}</span>
       </span>
       <span className="m">{link.meta}</span>
     </a>

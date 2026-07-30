@@ -2,11 +2,16 @@
 // gridgrid/grid (a browser-only, DOM library) never runs during SSR.
 //
 // Three modes share one canvas:
-//   - universe: an animated generative plasma field (tiny square cells)
-//   - life:     a churning Game of Life torus (tiny square cells)
+//   - universe: an animated generative plasma field (small square cells)
+//   - life:     a churning Game of Life torus (small square cells)
 //   - data:     a normal, nice SaaS data grid (wide cells, frozen header)
-// The field modes share geometry (recolor only). Switching to/from `data`
-// rebuilds the grid because the cell geometry is completely different.
+// Field modes share geometry (recolor only). Switching to/from `data`, or
+// changing the field size, rebuilds the grid.
+//
+// Perf notes: framerate is bounded by the number of *visible* cells (cell size),
+// not the total. So we use reasonably sized cells, recolor Life only when the
+// board actually steps, and recolor the plasma at ~30fps. Total size (the "crank
+// it up" control) only affects one-time setup cost, not steady-state fps.
 
 import type { Grid } from 'grid/dist/modules/core';
 import { create as makeSimpleGrid } from 'grid/dist/modules/simple-grid';
@@ -21,12 +26,12 @@ export type EngineInputs = {
   getMode: () => GridMode;
   getPattern: () => LifePattern;
   getResetNonce: () => number;
+  getFieldRows: () => number; // "crank it up" — total field cells = rows * FIELD_COLS
 };
 
 // --- field geometry (universe + life) ---
-const FIELD_ROWS = 40_000;
-const FIELD_COLS = 1_000;
-const FIELD_CELL = 15;
+const FIELD_COLS = 400;
+const FIELD_CELL = 18;
 
 // --- life torus ---
 const LIFE_H = 220;
@@ -34,13 +39,13 @@ const LIFE_W = 220;
 const LIFE_STEP_MS = 90;
 
 // --- data grid geometry ---
-const DATA_ROWS = 100_000;
+const DATA_ROWS = 20_000;
 const DATA_ROW_H = 40;
 type DataCol = { label: string; width: number; align: 'left' | 'right' };
 const DATA_COLS: DataCol[] = [
   { label: 'Name', width: 168, align: 'left' },
-  { label: 'Email', width: 230, align: 'left' },
-  { label: 'Company', width: 150, align: 'left' },
+  { label: 'Email', width: 236, align: 'left' },
+  { label: 'Company', width: 156, align: 'left' },
   { label: 'Status', width: 118, align: 'left' },
   { label: 'MRR', width: 96, align: 'right' },
   { label: 'Plan', width: 108, align: 'left' },
@@ -48,7 +53,20 @@ const DATA_COLS: DataCol[] = [
   { label: 'Signed up', width: 122, align: 'left' },
   { label: 'Last active', width: 118, align: 'left' },
   { label: 'Country', width: 150, align: 'left' },
+  { label: 'Region', width: 100, align: 'left' },
+  { label: 'Account owner', width: 176, align: 'left' },
+  { label: 'Renewal', width: 122, align: 'left' },
+  { label: 'Open tickets', width: 118, align: 'right' },
+  { label: 'NPS', width: 78, align: 'right' },
+  { label: 'Source', width: 130, align: 'left' },
+  { label: 'Last invoice', width: 130, align: 'right' },
+  { label: 'Health', width: 120, align: 'left' },
+  { label: 'Notes', width: 200, align: 'left' },
 ];
+const REGION = ['NA', 'EMEA', 'APAC', 'LATAM'];
+const SOURCE = ['Inbound', 'Referral', 'Outbound', 'Partner', 'Event'];
+const HEALTH = ['Healthy', 'Healthy', 'At risk', 'Critical'];
+const NOTES = ['', '', 'Follow up', 'VIP', 'Expansion', 'Renewal call', 'Churn risk'];
 
 const PALETTE_N = 256;
 const UNIVERSE_PALETTE = buildUniversePalette(PALETTE_N);
@@ -154,9 +172,9 @@ const COUNTRY = [
   'Portugal',
 ];
 const STATUS_COLOR: Record<string, string> = {
-  Active: '#57c98a',
-  Trialing: '#e0b64a',
-  'Past due': '#e07a5a',
+  Active: '#3fa96b',
+  Trialing: '#c69214',
+  'Past due': '#d8613b',
   Churned: '#8a929a',
 };
 
@@ -192,8 +210,26 @@ function cellText(row: number, col: number): string {
       return `2023-${pad2((hash(row, 8) % 12) + 1)}-${pad2((hash(row, 9) % 28) + 1)}`;
     case 8:
       return `${(hash(row, 10) % 30) + 1}d ago`;
-    default:
+    case 9:
       return pick(COUNTRY, hash(row, 11));
+    case 10:
+      return pick(REGION, hash(row, 12));
+    case 11:
+      return `${pick(FIRST, hash(row, 13))} ${pick(LAST, hash(row, 14))}`;
+    case 12:
+      return `2024-${pad2((hash(row, 15) % 12) + 1)}-${pad2((hash(row, 16) % 28) + 1)}`;
+    case 13:
+      return `${hash(row, 17) % 12}`;
+    case 14:
+      return `${(hash(row, 18) % 101) - 20}`;
+    case 15:
+      return pick(SOURCE, hash(row, 19));
+    case 16:
+      return `$${(hash(row, 20) % 400) * 5 + 20}`;
+    case 17:
+      return pick(HEALTH, hash(row, 21));
+    default:
+      return pick(NOTES, hash(row, 22));
   }
 }
 
@@ -201,17 +237,18 @@ export async function createGridEngine(
   container: HTMLElement,
   inputs: EngineInputs,
 ): Promise<GridEngine> {
-  const { getMode, getPattern, getResetNonce } = inputs;
+  const { getMode, getPattern, getResetNonce, getFieldRows } = inputs;
 
   let grid: Grid | null = null;
   let layout: 'field' | 'data' | null = null;
   let total = 0;
+  let fieldRows = getFieldRows();
 
-  // Field state
   const liveCells = new Map<HTMLElement, { r: number; c: number }>();
   let mode: GridMode = getMode();
   let time = 0;
   let painted = 0;
+  let uniTick = 0;
 
   // Life state
   let board: Uint8Array = new Uint8Array(LIFE_H * LIFE_W);
@@ -224,9 +261,7 @@ export async function createGridEngine(
     return (((r % LIFE_H) + LIFE_H) % LIFE_H) * LIFE_W + (((c % LIFE_W) + LIFE_W) % LIFE_W);
   }
   function stamp(cells: number[][], row: number, col: number) {
-    for (const cell of cells) {
-      board[idx(row + (cell[0] ?? 0), col + (cell[1] ?? 0))] = 1;
-    }
+    for (const cell of cells) board[idx(row + (cell[0] ?? 0), col + (cell[1] ?? 0))] = 1;
   }
   function seedLife(pattern: LifePattern) {
     board.fill(0);
@@ -240,9 +275,8 @@ export async function createGridEngine(
         [2, 1],
         [2, 2],
       ];
-      for (let r = 6; r < LIFE_H - 6; r += 26) {
+      for (let r = 6; r < LIFE_H - 6; r += 26)
         for (let c = 6; c < LIFE_W - 6; c += 26) stamp(g, r, c);
-      }
     } else if (pattern === 'rpentomino') {
       stamp(
         [
@@ -289,21 +323,21 @@ export async function createGridEngine(
     const swap = board;
     board = scratch;
     scratch = swap;
-    // Random soup thins out; keep it churning. Structured patterns run pure.
     if (lastPattern === 'soup') {
       for (let k = 0; k < 60; k++) board[(Math.random() * board.length) | 0] = 1;
     }
   }
 
   function fieldColor(r: number, c: number): string {
-    if (mode === 'life') {
-      return board[idx(r, c)] === 1 ? LIFE_ALIVE : LIFE_DEAD;
-    }
+    if (mode === 'life') return board[idx(r, c)] === 1 ? LIFE_ALIVE : LIFE_DEAD;
     const v =
       Math.sin(r * 0.06 + time) +
       Math.sin(c * 0.06 + time * 0.9) +
       Math.sin((r + c) * 0.045 + time * 0.5);
     return UNIVERSE_PALETTE[clampIndex(((v / 6 + 0.5) * PALETTE_N) | 0, PALETTE_N)] ?? LIFE_DEAD;
+  }
+  function recolorField() {
+    for (const [el, pos] of liveCells) el.style.background = fieldColor(pos.r, pos.c);
   }
 
   function teardown() {
@@ -317,7 +351,7 @@ export async function createGridEngine(
     teardown();
     container.classList.remove('is-data');
     const g = makeSimpleGrid(
-      FIELD_ROWS,
+      fieldRows,
       FIELD_COLS,
       [FIELD_CELL],
       [FIELD_CELL],
@@ -349,7 +383,7 @@ export async function createGridEngine(
     g.build(container);
     grid = g;
     layout = 'field';
-    total = FIELD_ROWS * FIELD_COLS;
+    total = fieldRows * FIELD_COLS;
   }
 
   function buildDataGrid() {
@@ -424,9 +458,11 @@ export async function createGridEngine(
     }
   }
 
-  // Initial build
   ensureLayout(mode);
-  if (mode === 'life') seedLife(getPattern());
+  if (mode === 'life') {
+    seedLife(getPattern());
+    recolorField();
+  }
 
   // --- animation loop ---
   let raf = 0;
@@ -451,28 +487,40 @@ export async function createGridEngine(
     ensureLayout(next);
     mode = next;
 
+    if (layout === 'field') {
+      const size = getFieldRows();
+      if (size !== fieldRows) {
+        fieldRows = size;
+        buildFieldGrid();
+      }
+    }
+
     if (mode === 'life') {
       const pattern = getPattern();
       const nonce = getResetNonce();
+      let seeded = false;
       if (changedMode || pattern !== lastPattern || nonce !== lastResetNonce) {
         lastPattern = pattern;
         lastResetNonce = nonce;
         seedLife(pattern);
+        seeded = true;
       }
       lifeAccMs += dt;
+      let stepped = false;
       if (lifeAccMs >= LIFE_STEP_MS) {
         lifeAccMs = 0;
         stepLife();
+        stepped = true;
       }
-      for (const [el, pos] of liveCells) el.style.background = fieldColor(pos.r, pos.c);
+      if (seeded || stepped) recolorField();
       painted = liveCells.size;
     } else if (mode === 'universe') {
       time += dt * 0.0012;
-      for (const [el, pos] of liveCells) el.style.background = fieldColor(pos.r, pos.c);
+      uniTick ^= 1;
+      if (uniTick === 0) recolorField(); // ~30fps recolor is plenty for slow plasma
       painted = liveCells.size;
     } else {
-      // data grid is static; the grid repaints text itself on scroll.
-      painted = liveCells.size;
+      painted = liveCells.size; // data grid is static; the grid repaints on scroll
     }
 
     raf = requestAnimationFrame(frame);

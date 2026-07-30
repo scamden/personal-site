@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
 
+import { ThemeToggle } from '#/components/theme-toggle.tsx';
 import type { GridEngine, GridMode, GridStats, LifePattern } from '#/grid-demo/engine.ts';
 import '#/grid-demo/grid-demo.css';
 
@@ -13,11 +14,18 @@ const PATTERNS: { value: LifePattern; label: string }[] = [
   { value: 'pulsars', label: 'Pulsars' },
   { value: 'rpentomino', label: 'R-pentomino' },
 ];
+// rows; total field cells = rows * 400 (FIELD_COLS). Bigger = slower one-time
+// setup, same steady-state fps.
+const SIZES: { value: number; label: string }[] = [
+  { value: 5_000, label: '2M cells' },
+  { value: 40_000, label: '16M cells' },
+  { value: 150_000, label: '60M cells' },
+];
 
 function subtitleFor(mode: GridMode): string {
   return mode === 'data'
     ? 'The same grid, doing what it was built for.'
-    : 'Forty million cells. It only ever paints the ones you can see.';
+    : 'It only ever paints the cells you can actually see.';
 }
 
 function GridDemo() {
@@ -28,9 +36,11 @@ function GridDemo() {
   const modeRef = useRef<GridMode>('universe');
   const patternRef = useRef<LifePattern>('soup');
   const resetRef = useRef(0);
+  const sizeRef = useRef(SIZES[0]?.value ?? 5_000);
 
   const [mode, setMode] = useState<GridMode>('universe');
   const [pattern, setPattern] = useState<LifePattern>('soup');
+  const [size, setSize] = useState(sizeRef.current);
   const [stats, setStats] = useState<GridStats | null>(null);
 
   useEffect(() => {
@@ -47,6 +57,7 @@ function GridDemo() {
           getMode: () => modeRef.current,
           getPattern: () => patternRef.current,
           getResetNonce: () => resetRef.current,
+          getFieldRows: () => sizeRef.current,
         }).then((engine) => {
           if (cancelled) {
             engine.destroy();
@@ -76,6 +87,10 @@ function GridDemo() {
     patternRef.current = next;
     setPattern(next);
   };
+  const handleSize = (next: number) => {
+    sizeRef.current = next;
+    setSize(next);
+  };
   const handleReset = () => {
     resetRef.current += 1;
   };
@@ -85,6 +100,8 @@ function GridDemo() {
       <div className="griddemo-canvas" ref={canvasRef} />
 
       <div className="griddemo-ui">
+        <ThemeToggle />
+
         <div className="griddemo-top">
           <Link to="/" className="griddemo-back">
             ← sterlingcamden.com
@@ -113,23 +130,40 @@ function GridDemo() {
               </button>
             </div>
 
-            {mode === 'life' ? (
-              <div className="griddemo-life">
+            {mode !== 'data' ? (
+              <div className="griddemo-tools">
                 <select
                   className="griddemo-select"
-                  value={pattern}
-                  onChange={(e) => handlePattern(e.target.value as LifePattern)}
-                  aria-label="Starting pattern"
+                  value={size}
+                  onChange={(e) => handleSize(Number(e.target.value))}
+                  aria-label="Grid size"
                 >
-                  {PATTERNS.map((p) => (
-                    <option key={p.value} value={p.value}>
-                      {p.label}
+                  {SIZES.map((s) => (
+                    <option key={s.value} value={s.value}>
+                      {s.label}
                     </option>
                   ))}
                 </select>
-                <button type="button" className="griddemo-reset" onClick={handleReset}>
-                  ↺ Reset
-                </button>
+
+                {mode === 'life' ? (
+                  <>
+                    <select
+                      className="griddemo-select"
+                      value={pattern}
+                      onChange={(e) => handlePattern(e.target.value as LifePattern)}
+                      aria-label="Starting pattern"
+                    >
+                      {PATTERNS.map((p) => (
+                        <option key={p.value} value={p.value}>
+                          {p.label}
+                        </option>
+                      ))}
+                    </select>
+                    <button type="button" className="griddemo-reset" onClick={handleReset}>
+                      ↺ Reset
+                    </button>
+                  </>
+                ) : null}
               </div>
             ) : null}
           </div>
