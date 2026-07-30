@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 
 import { ThemeToggle } from '#/components/theme-toggle.tsx';
 import { type HeroPiece, type ResourceLink, site } from '#/data/site.ts';
@@ -22,8 +22,24 @@ function LinkIcon({ href }: { href: string }) {
       </svg>
     );
   }
-  if (href.includes('youtu') || href.startsWith('/')) {
-    // video, and the internal live demo — a play marker
+  if (href.startsWith('/')) {
+    // internal live demo — a grid marker
+    return (
+      <svg
+        className="licon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        aria-hidden="true"
+      >
+        <rect x="3.5" y="3.5" width="17" height="17" rx="1.5" />
+        <path d="M3.5 9.5h17M3.5 15h17M9.5 3.5v17M15 3.5v17" />
+      </svg>
+    );
+  }
+  if (href.includes('youtu')) {
+    // video — a play marker
     return (
       <svg className="licon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <circle cx="12" cy="12" r="9.2" stroke="currentColor" strokeWidth="1.7" />
@@ -137,7 +153,22 @@ function Home() {
       <ThemeToggle />
       <div className="band">
         <div className="wrap">
-          <p className="kicker reveal">{site.name}</p>
+          <div className="masthead reveal">
+            <p className="kicker">{site.name}</p>
+            <nav className="topnav">
+              <Link to="/grid" search={{ mode: 'universe' }} className="topnav-link">
+                the grid
+              </Link>
+              <a
+                href="https://ear-trainer-ynb.pages.dev/"
+                target="_blank"
+                rel="noreferrer"
+                className="topnav-link"
+              >
+                ear trainer
+              </a>
+            </nav>
+          </div>
 
           <h1 className="hero reveal d1">
             {site.hero.map((piece, i) => (

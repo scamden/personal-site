@@ -68,6 +68,40 @@ a {
   margin: 0 auto;
 }
 
+/* masthead: name, then a small nav row directly beneath it. left-aligned so
+   the two read as one unit. the row is the seed of a nav — more items join
+   when there are more pages. */
+.masthead {
+  margin: 0 0 clamp(28px, 4vw, 42px);
+}
+.masthead .kicker {
+  margin: 0 0 11px;
+}
+.topnav {
+  display: flex;
+  font-family: var(--sans);
+}
+.topnav-link {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+/* middot between items — the quiet "this is a nav set" cue */
+.topnav-link + .topnav-link::before {
+  content: "·";
+  margin: 0 11px;
+  color: var(--muted);
+}
+.topnav-link:hover {
+  color: var(--accent);
+}
+.topnav-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
 .kicker {
   font-family: var(--sans);
   font-size: clamp(14px, 1.7vw, 16px);
@@ -75,7 +109,7 @@ a {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink);
-  margin: 0 0 clamp(28px, 4vw, 42px);
+  margin: 0;
 }
 
 .hero {
