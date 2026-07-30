@@ -41,7 +41,8 @@ export const site = {
       body: [
         // thesis first, then the story, then what I'm chewing on now.
         'A former atheist who came to faith as an adult, now trying to get precise about it. Truth over tribe, possibility over certainty. I’d rather hold the hard questions honestly than reach for tidy answers.',
-        'I fell hard into alcoholism in college and failed to quit more times than I can count. Then one desperate night, in the dead of winter on my mom’s back porch, I found myself saying out loud, over and over, “please don’t let me drink anymore.” Night by night it became “thank you that I’m not drinking.” Within two weeks I knew something miraculous was happening, though I hardly dared believe it. It set me free. That was nineteen years ago, and apart from one disastrous nine-month experiment two years in, I’ve been sober ever since. Slowly, I started seeing God in everything, from the wind to song lyrics. Eventually I went all in on Jesus, but that’s another story.',
+        'I fell hard into alcoholism in college and failed to quit more times than I can count. Then one desperate night, in the dead of winter on my mom’s back porch, I found myself saying out loud, over and over, “please don’t let me drink anymore.” Night by night it became “thank you that I’m not drinking.” Within two weeks I knew something miraculous was happening, though I hardly dared believe it. It set me free.',
+        'That was nineteen years ago, and apart from one disastrous nine-month experiment two years in, I’ve been sober ever since. Slowly, I started seeing God in everything, from the wind to song lyrics. Eventually I went all in on Jesus, but that’s another story.',
         'Lately I’m chewing on consciousness, the limits of logic, and what actually sits at the truest core of my Christian experience.',
       ],
       note: 'A podcast about all this is coming. It’ll live here first.',
