@@ -13,8 +13,10 @@
 // board actually steps, and recolor the plasma at ~30fps. Total size (the "crank
 // it up" control) only affects one-time setup cost, not steady-state fps.
 
-import type { Grid } from 'grid/dist/modules/core';
+import type { IRowDescriptor } from 'grid/dist/modules/abstract-row-col-model';
+import { type Grid, create as makeGrid } from 'grid/dist/modules/core';
 import { create as makeSimpleGrid } from 'grid/dist/modules/simple-grid';
+import type { IVirtualPixelCellDimensionInfo } from 'grid/dist/modules/virtual-pixel-cell-model';
 import 'grid/dist/css.css';
 
 export type GridMode = 'universe' | 'life' | 'data';
@@ -86,6 +88,51 @@ function clampIndex(v: number, n: number): number {
 }
 function layoutFor(mode: GridMode): 'field' | 'data' {
   return mode === 'data' ? 'data' : 'field';
+}
+
+// Cell classes are cached per cell of the *virtual* grid, and the view layer's
+// defaults span the whole thing — the blanket `grid-cell` rule alone is 60
+// million cache entries at the largest field size, which is what killed the
+// tab. The field grid has no headers, no fixed rows or columns, and paints its
+// own cells, so none of those defaults apply to it. (The data grid keeps them:
+// 380k entries there, and its cells do use the library's classes.)
+function dropDefaultCellClasses(g: Grid) {
+  for (const descriptor of g.cellClasses.getAll()) g.cellClasses.remove(descriptor);
+}
+
+// Every field cell is the same size, so pixel <-> cell conversion is division.
+// The library's general version walks the model one row at a time — 150k
+// additions per call at the largest field size, several calls per frame — which
+// is the difference between scrolling 60M cells and crawling through them.
+function applyUniformCellGeometry(g: Grid, size: number) {
+  const model = g.virtualPixelCellModel;
+  const uniform = (dim: IVirtualPixelCellDimensionInfo, gridDim: typeof g.rows) => {
+    const count = () => gridDim.rowColModel.length(true);
+    dim.sizeOf = (start, end) => {
+      if (end !== undefined && end < start) return 0; // matches the library: empty range
+      const first = dim.clampCell(start);
+      const last = dim.clampCell(typeof end === 'number' ? end : start);
+      return last < first ? 0 : (last - first + 1) * size;
+    };
+    dim.toCellFromPx = (px) => {
+      const cell = Math.floor(px / size);
+      return px < 0 || cell >= count() ? Number.NaN : cell;
+    };
+    dim.totalSize = () => count() * size;
+    dim.fixedSize = () => dim.sizeOf(0, gridDim.rowColModel.numFixed() - 1);
+    return dim;
+  };
+  const rows = uniform(model.rows, g.rows);
+  const cols = uniform(model.cols, g.cols);
+  // the model's top-level aliases captured the originals when it was created
+  model.getRow = rows.toCellFromPx;
+  model.getCol = cols.toCellFromPx;
+  model.height = rows.sizeOf;
+  model.width = cols.sizeOf;
+  model.totalHeight = rows.totalSize;
+  model.totalWidth = cols.totalSize;
+  model.fixedHeight = rows.fixedSize;
+  model.fixedWidth = cols.fixedSize;
 }
 function currentIsDark(): boolean {
   const t = document.documentElement.getAttribute('data-theme');
@@ -253,12 +300,22 @@ export async function createGridEngine(
   let total = 0;
   let fieldRows = getFieldRows();
 
-  const liveCells = new Map<HTMLElement, { r: number; c: number }>();
   let mode: GridMode = getMode();
   let isDark = currentIsDark();
   let time = 0;
-  let painted = 0;
   let uniTick = 0;
+
+  // The grid owns cell painting: marking the data dirty makes it run the cell
+  // builders inside its own draw, so a recolor lands in the same rAF pass as a
+  // scroll instead of racing it with a second set of style writes.
+  function requestRepaint() {
+    grid?.dataModel.setDirty();
+  }
+  // What the grid is actually drawing this frame — the viewport's own cell
+  // count, not a tally we keep in step with it.
+  function visibleCells(): number {
+    return grid ? grid.viewPort.rows * grid.viewPort.cols : 0;
+  }
 
   // Life state
   let board: Uint8Array = new Uint8Array(LIFE_H * LIFE_W);
@@ -350,35 +407,24 @@ export async function createGridEngine(
       Math.sin((r + c) * 0.045 + time * 0.5);
     return UNIVERSE_PALETTE[clampIndex(((v / 6 + 0.5) * PALETTE_N) | 0, PALETTE_N)] ?? '#000';
   }
-  function recolorField() {
-    for (const [el, pos] of liveCells) el.style.background = fieldColor(pos.r, pos.c);
-  }
-
   function teardown() {
     if (grid) grid.destroy();
     grid = null;
-    liveCells.clear();
     container.innerHTML = '';
   }
 
   function buildFieldGrid() {
     teardown();
     container.classList.remove('is-data');
-    const g = makeSimpleGrid(
-      fieldRows,
-      FIELD_COLS,
-      [FIELD_CELL],
-      [FIELD_CELL],
-      0,
-      0,
-      undefined,
-      0,
-      0,
-      {
-        snapToCell: false,
-        allowEdit: false,
-      },
-    );
+    // Not simple-grid: it seeds the data model with one object per cell, which
+    // is 60 million of them at the largest size. The field has no data — the
+    // builder paints from the row/col index — so the grid only needs row and
+    // column descriptors, sized uniformly through defaultSize.
+    const g = makeGrid({ snapToCell: false, allowEdit: false });
+    g.rowModel.defaultSize = FIELD_CELL;
+    g.colModel.defaultSize = FIELD_CELL;
+    dropDefaultCellClasses(g);
+    applyUniformCellGeometry(g, FIELD_CELL);
     const builder = g.colModel.createBuilder(
       () => {
         const el = document.createElement('div');
@@ -386,14 +432,22 @@ export async function createGridEngine(
         return el;
       },
       (el, ctx) => {
-        if (el) {
-          liveCells.set(el, { r: ctx.virtualRow, c: ctx.virtualCol });
-          el.style.background = fieldColor(ctx.virtualRow, ctx.virtualCol);
-        }
+        if (el) el.style.background = fieldColor(ctx.virtualRow, ctx.virtualCol);
         return el;
       },
     );
-    for (let c = 0; c < g.colModel.length(); c++) g.colModel.get(c).builder = builder;
+    // rowModel.create() wires up change tracking (four accessors and their
+    // closures per descriptor), which costs seconds across 150k rows. Field rows
+    // never change — same height, never hidden, reordered or selected — so they
+    // are plain descriptors. Columns keep the real thing: only 400 of them, and
+    // they carry the builder.
+    const rows: IRowDescriptor[] = [];
+    for (let r = 0; r < fieldRows; r++) rows.push({ isBuiltActionable: true, expanded: false });
+    const cols = [];
+    for (let c = 0; c < FIELD_COLS; c++) cols.push(g.colModel.create(builder));
+    g.rowModel.add(rows);
+    g.colModel.add(cols);
+
     g.build(container);
     container.style.touchAction = 'none'; // full-screen demo owns the gesture
     grid = g;
@@ -437,7 +491,6 @@ export async function createGridEngine(
         el.style.textAlign = spec?.align ?? 'left';
         el.classList.toggle('odd', dataRow % 2 === 1);
         el.style.color = col === 3 ? (STATUS_COLOR[cellText(dataRow, 3)] ?? '') : '';
-        liveCells.set(el, { r: ctx.virtualRow, c: ctx.virtualCol });
         return el;
       },
     );
@@ -483,7 +536,7 @@ export async function createGridEngine(
   ensureLayout(mode);
   if (mode === 'life') {
     seedLife(getPattern());
-    recolorField();
+    requestRepaint();
   }
 
   // Touch scrolling (drag + flick momentum, edge handoff, tap-vs-scroll slop)
@@ -524,7 +577,7 @@ export async function createGridEngine(
     const dark = currentIsDark();
     if (dark !== isDark) {
       isDark = dark;
-      if (layout === 'field') recolorField();
+      if (layout === 'field') requestRepaint();
     }
 
     if (mode === 'life') {
@@ -544,23 +597,20 @@ export async function createGridEngine(
         stepLife();
         stepped = true;
       }
-      if (seeded || stepped) recolorField();
-      painted = liveCells.size;
+      if (seeded || stepped) requestRepaint();
     } else if (mode === 'universe') {
       time += dt * 0.0012;
       uniTick ^= 1;
-      if (uniTick === 0) recolorField(); // ~30fps recolor is plenty for slow plasma
-      painted = liveCells.size;
-    } else {
-      painted = liveCells.size; // data grid is static; the grid repaints on scroll
+      if (uniTick === 0) requestRepaint(); // ~30fps recolor is plenty for slow plasma
     }
+    // data mode paints itself: the grid redraws on scroll, nothing animates
 
     raf = requestAnimationFrame(frame);
   }
   raf = requestAnimationFrame(frame);
 
   return {
-    stats: () => ({ fps, visible: painted, total, mode }),
+    stats: () => ({ fps, visible: visibleCells(), total, mode }),
     destroy: () => {
       cancelAnimationFrame(raf);
       teardown();

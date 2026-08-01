@@ -5,6 +5,12 @@
   position: fixed;
   inset: 0;
   overflow: hidden;
+  /* top bar / canvas / bottom bar. The bars size themselves, so the data-mode
+     frame follows them however they wrap on narrow screens. */
+  display: grid;
+  grid-template-columns: 1fr; /* one column; every child is pinned to it so the
+     bars overlay the canvas instead of auto-placing beside it */
+  grid-template-rows: auto 1fr auto;
   background: var(--paper);
   color: var(--ink);
   font-family: var(--sans);
@@ -14,8 +20,12 @@
 }
 
 .griddemo-canvas {
-  position: absolute;
-  inset: 0;
+  /* field modes: full bleed, with the overlay floating on top of it */
+  grid-column: 1;
+  grid-row: 1 / -1;
+  position: relative; /* the library pins its cell layers to this box */
+  min-width: 0;
+  min-height: 0;
   /* The grid library owns touch gestures (drag + flick) and defaults an embedded
      grid to touch-action: pan-x pan-y. This full-screen demo owns the whole
      gesture instead, so the engine re-asserts `none` after build; this rule just
@@ -35,8 +45,7 @@
 /* Framed between the top bar and the bottom controls. */
 .griddemo-canvas.is-data {
   background: var(--paper);
-  top: 92px;
-  bottom: 74px;
+  grid-row: 2;
 }
 .dcell {
   position: absolute;
@@ -77,15 +86,11 @@
 }
 
 /* --- overlay UI --- */
+/* The two bars are rows of .griddemo itself; this wrapper only carries the
+   inherited overlay defaults. */
 .griddemo-ui {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
+  display: contents;
   pointer-events: none;
-  padding: 20px 22px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   color: var(--ink);
 }
 .griddemo-ui a,
@@ -95,6 +100,11 @@
 }
 
 .griddemo-top {
+  grid-column: 1;
+  grid-row: 1;
+  position: relative; /* above the canvas, whose cell layers carry z-indexes */
+  z-index: 5;
+  padding: 20px 22px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -148,6 +158,11 @@
 }
 
 .griddemo-bottom {
+  grid-column: 1;
+  grid-row: 3;
+  position: relative;
+  z-index: 5;
+  padding: 20px 22px;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
