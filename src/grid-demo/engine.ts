@@ -107,6 +107,10 @@ function layoutFor(mode: GridMode): 'field' | 'data' {
 // 380k entries there, and its cells do use the library's classes.)
 function dropDefaultCellClasses(g: Grid) {
   for (const descriptor of g.cellClasses.getAll()) g.cellClasses.remove(descriptor);
+  // With no classes left to apply, the draw's class pass still walks every
+  // visible cell to join an empty list onto it — 2.3ms per scroll frame at
+  // 3,358 cells, and scrolling is when it runs.
+  g.viewLayer._drawCellClasses = () => {};
 }
 
 // Every field cell is the same size, so pixel <-> cell conversion is division.
