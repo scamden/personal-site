@@ -276,6 +276,23 @@ a {
   outline-offset: 4px;
 }
 
+/* On narrow screens the nowrap meta reserved a fixed column and starved the
+   title, so long "Artist · Work" names broke a word per line. Stack instead:
+   the title gets the full width, the meta sits under it, indented past the
+   icon so it lines up with the title text. Must stay after the base rules:
+   equal specificity, so source order decides. */
+@media (max-width: 640px) {
+  .reslist .item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  .reslist .item .m {
+    white-space: normal;
+    padding-left: 23px;
+  }
+}
+
 /* ---- featured work: a list row promoted by scale + space, not a box, so it
    stays in the page's typographic language (no enclosures, only hairlines) ---- */
 .feature {
