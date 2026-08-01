@@ -29,6 +29,9 @@ export type GridStats = {
   // where you are: the top row in view, and how many there are to reach
   row: number;
   rows: number;
+  // the geometry the engine actually has right now, which lags the controls
+  // while a rebuild is in flight
+  cell: number;
 };
 export type GridEngine = { stats: () => GridStats; destroy: () => void };
 
@@ -37,12 +40,13 @@ export type EngineInputs = {
   getPattern: () => LifePattern;
   getResetNonce: () => number;
   getFieldRows: () => number; // "crank it up" — total field cells = rows * FIELD_COLS
-  getLifeCell: () => number; // Life's zoom, in px per cell
+  getCellSize: () => number; // px per field cell; the route decides what the window can afford
 };
 
 // --- field geometry (universe + life) ---
+// Cell size is the route's call: it is what decides how many cells land on
+// screen, and so what a frame costs.
 const FIELD_COLS = 400;
-const FIELD_CELL = 18;
 
 // --- life torus ---
 const LIFE_H = 220;
@@ -306,21 +310,17 @@ export async function createGridEngine(
   container: HTMLElement,
   inputs: EngineInputs,
 ): Promise<GridEngine> {
-  const { getMode, getPattern, getResetNonce, getFieldRows, getLifeCell } = inputs;
+  const { getMode, getPattern, getResetNonce, getFieldRows, getCellSize } = inputs;
 
   let grid: Grid | null = null;
   let layout: 'field' | 'data' | null = null;
   let total = 0;
   let fieldRows = getFieldRows();
-  let fieldCell = FIELD_CELL;
-
-  // Only Life zooms. The plasma computes a distinct colour per cell per frame,
-  // so shrinking its cells multiplies the most expensive thing the demo does;
-  // Life writes one of two colours and only when the board steps, which is
-  // cheap enough to spend on seeing more of the board at once.
-  function cellSizeFor(next: GridMode): number {
-    return next === 'life' ? getLifeCell() : FIELD_CELL;
-  }
+  let fieldCell = getCellSize();
+  // Rebuilding the field blocks for long enough at the bigger sizes to look like
+  // a hang, so a geometry change waits one frame before it runs. That frame is
+  // what lets the route paint "building the grid…" first.
+  let pendingGeometry: { rows: number; cell: number } | null = null;
   // Zoom without rebuilding: the rows, the columns and the grid itself are all
   // still correct, only their size changed. Rebuilding threw away 150k
   // descriptors and, worse, your scroll position — you zoomed out to see more of
@@ -497,7 +497,7 @@ export async function createGridEngine(
     // builder paints from the row/col index — so the grid only needs row and
     // column descriptors, sized uniformly through defaultSize.
     const g = makeGrid({ snapToCell: false, allowEdit: false });
-    fieldCell = cellSizeFor(getMode());
+    fieldCell = getCellSize();
     g.rowModel.defaultSize = fieldCell;
     g.colModel.defaultSize = fieldCell;
     dropDefaultCellClasses(g);
@@ -643,13 +643,20 @@ export async function createGridEngine(
     mode = next;
 
     if (layout === 'field') {
-      const size = getFieldRows();
-      if (size !== fieldRows) {
-        fieldRows = size;
-        buildFieldGrid();
-      } else if (cellSizeFor(mode) !== fieldCell) {
-        // zoom changed, or we left Life with a zoom applied
-        applyZoom(cellSizeFor(mode));
+      if (pendingGeometry) {
+        const { rows, cell } = pendingGeometry;
+        pendingGeometry = null;
+        if (rows !== fieldRows) {
+          fieldRows = rows; // buildFieldGrid picks the cell size up from getCellSize
+          buildFieldGrid();
+        } else if (cell !== fieldCell) {
+          applyZoom(cell);
+        }
+      } else {
+        const rows = getFieldRows();
+        const cell = getCellSize();
+        // announce the change now, do it next frame, so the readout can say so
+        if (rows !== fieldRows || cell !== fieldCell) pendingGeometry = { rows, cell };
       }
     }
 
@@ -697,6 +704,7 @@ export async function createGridEngine(
       mode,
       row: topRow(),
       rows: totalRows(),
+      cell: fieldCell,
     }),
     destroy: () => {
       cancelAnimationFrame(raf);
