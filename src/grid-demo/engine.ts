@@ -317,6 +317,27 @@ export async function createGridEngine(
   function cellSizeFor(next: GridMode): number {
     return next === 'life' ? getLifeCell() : FIELD_CELL;
   }
+  // Zoom without rebuilding: the rows, the columns and the grid itself are all
+  // still correct, only their size changed. Rebuilding threw away 150k
+  // descriptors and, worse, your scroll position — you zoomed out to see more of
+  // what you were watching and got dropped back at the origin.
+  function applyZoom(cell: number) {
+    if (!grid || layout !== 'field') return;
+    // hold whatever is in the middle of the screen in the middle, the way a map
+    // zooms — and it keeps the view full when zooming out near an edge
+    const centerRow = grid.cellScrollModel.row + (grid.viewPort.rows >> 1);
+    const centerCol = grid.cellScrollModel.col + (grid.viewPort.cols >> 1);
+    fieldCell = cell;
+    grid.rowModel.defaultSize = cell;
+    grid.colModel.defaultSize = cell;
+    applyUniformCellGeometry(grid, cell);
+    grid.viewPort._resize(); // re-measure the container against the new cell size
+    grid.cellScrollModel.scrollTo(
+      Math.max(0, centerRow - (grid.viewPort.rows >> 1)),
+      Math.max(0, centerCol - (grid.viewPort.cols >> 1)),
+    );
+    requestRepaint();
+  }
 
   let mode: GridMode = getMode();
   let isDark = currentIsDark();
@@ -624,7 +645,7 @@ export async function createGridEngine(
         buildFieldGrid();
       } else if (cellSizeFor(mode) !== fieldCell) {
         // zoom changed, or we left Life with a zoom applied
-        buildFieldGrid();
+        applyZoom(cellSizeFor(mode));
       }
     }
 

@@ -31,12 +31,13 @@ const SIZES: { value: number; label: string }[] = [
   { value: 40_000, label: '16M cells' },
   { value: 150_000, label: '60M cells' },
 ];
-// px per cell, Life only. Every step repaints every visible cell, so zooming out
-// buys board at the cost of paint: 9px is ~4x the cells of 18px.
+// px per cell, Life only, as zoom-out factors from the 18px default. Every step
+// repaints every visible cell, so each step out is 4x the cells to paint.
+const DEFAULT_ZOOM = 18;
 const ZOOMS: { value: number; label: string }[] = [
-  { value: 18, label: 'Close' },
-  { value: 12, label: 'Wider' },
-  { value: 9, label: 'Widest' },
+  { value: DEFAULT_ZOOM * 2, label: '0.5×' },
+  { value: DEFAULT_ZOOM, label: '1×' },
+  { value: DEFAULT_ZOOM / 2, label: '2×' },
 ];
 
 function subtitleFor(mode: GridMode): string {
@@ -57,7 +58,7 @@ function GridDemo() {
   const patternRef = useRef<LifePattern>('soup');
   const resetRef = useRef(0);
   const sizeRef = useRef(SIZES[0]?.value ?? 5_000);
-  const zoomRef = useRef(ZOOMS[0]?.value ?? 18);
+  const zoomRef = useRef(DEFAULT_ZOOM);
 
   const [mode, setMode] = useState<GridMode>(initialMode);
   const [pattern, setPattern] = useState<LifePattern>('soup');
