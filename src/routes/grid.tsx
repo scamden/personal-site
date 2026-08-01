@@ -77,7 +77,8 @@ function GridDemo() {
             return;
           }
           engineRef.current = engine;
-          poll = window.setInterval(() => setStats(engine.stats()), 250);
+          // fast enough that the row counter reads like an odometer under a fling
+          poll = window.setInterval(() => setStats(engine.stats()), 100);
         }),
       )
       .catch((err) => {
@@ -188,6 +189,10 @@ function GridDemo() {
             <div>
               painting <b>{(stats?.visible ?? 0).toLocaleString()}</b> of{' '}
               <b>{(stats?.total ?? 0).toLocaleString()}</b> cells
+            </div>
+            <div>
+              row <b>{(stats?.row ?? 0).toLocaleString()}</b> of{' '}
+              <b>{(stats?.rows ?? 0).toLocaleString()}</b>
             </div>
             <div>
               <b>{stats?.fps ?? 0}</b> fps
