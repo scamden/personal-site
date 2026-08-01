@@ -138,14 +138,9 @@ export const site = {
       ],
       links: [
         {
-          title: 'All the Love You Gave',
+          title: 'this one is',
           meta: 'Newer',
-          href: 'https://soundcloud.com/sterling-camden-261510100/all-the-love-you-gave',
-        },
-        {
-          title: 'My Friend',
-          meta: 'Newer',
-          href: 'https://soundcloud.com/sterling-camden-261510100/my-friend',
+          href: 'https://soundcloud.com/sterling-camden-261510100/sets/this-one-is',
         },
         {
           title: 'this is not a christian rock album',
