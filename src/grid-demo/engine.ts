@@ -307,7 +307,6 @@ export async function createGridEngine(
   let layout: 'field' | 'data' | null = null;
   let total = 0;
   let fieldRows = getFieldRows();
-
   let mode: GridMode = getMode();
   let isDark = currentIsDark();
   let time = 0;
@@ -347,8 +346,32 @@ export async function createGridEngine(
   function stamp(cells: number[][], row: number, col: number) {
     for (const cell of cells) board[idx(row + (cell[0] ?? 0), col + (cell[1] ?? 0))] = 1;
   }
+  // The board is a torus tiled across the field, so a fixed board coordinate can
+  // sit anywhere relative to what you're looking at — the R-pentomino lived at
+  // the board's centre and started off screen every time. Patterns are stamped
+  // around the middle of the view instead, which is clear of the overlay bars at
+  // any size, so seeding (and Reset) always puts the action in front of you.
+  function viewCenter(): { r: number; c: number } {
+    if (!grid) return { r: 0, c: 0 };
+    return {
+      r: grid.cellScrollModel.row + (grid.viewPort.rows >> 1),
+      c: grid.cellScrollModel.col + (grid.viewPort.cols >> 1),
+    };
+  }
+  // Stamp a pattern about its own middle, so what lands on screen is the whole
+  // shape rather than its top-left corner.
+  function stampCentered(cells: number[][], row: number, col: number) {
+    let height = 0;
+    let width = 0;
+    for (const cell of cells) {
+      height = Math.max(height, cell[0] ?? 0);
+      width = Math.max(width, cell[1] ?? 0);
+    }
+    stamp(cells, row - (height >> 1), col - (width >> 1));
+  }
   function seedLife(pattern: LifePattern) {
     board.fill(0);
+    const { r: anchorRow, c: anchorCol } = viewCenter();
     if (pattern === 'soup') {
       for (let i = 0; i < board.length; i++) board[i] = Math.random() < 0.32 ? 1 : 0;
     } else if (pattern === 'gliders') {
@@ -359,10 +382,10 @@ export async function createGridEngine(
         [2, 1],
         [2, 2],
       ];
-      for (let r = 6; r < LIFE_H - 6; r += 26)
-        for (let c = 6; c < LIFE_W - 6; c += 26) stamp(g, r, c);
+      for (let r = 0; r < LIFE_H; r += 26)
+        for (let c = 0; c < LIFE_W; c += 26) stamp(g, anchorRow + r, anchorCol + c);
     } else if (pattern === 'rpentomino') {
-      stamp(
+      stampCentered(
         [
           [0, 1],
           [0, 2],
@@ -370,17 +393,17 @@ export async function createGridEngine(
           [1, 1],
           [2, 1],
         ],
-        (LIFE_H >> 1) - 1,
-        (LIFE_W >> 1) - 1,
+        anchorRow,
+        anchorCol,
       );
     } else if (pattern === 'pulsars') {
       const p = pulsarCells();
-      stamp(p, 40, 40);
-      stamp(p, 40, 140);
-      stamp(p, 140, 90);
+      stampCentered(p, anchorRow, anchorCol);
+      stampCentered(p, anchorRow + 20, anchorCol + 20);
+      stampCentered(p, anchorRow + 100, anchorCol + 50);
     } else {
-      stamp(gosperGun(), 20, 20);
-      stamp(gosperGun(), 120, 120);
+      stampCentered(gosperGun(), anchorRow, anchorCol);
+      stampCentered(gosperGun(), anchorRow + 100, anchorCol + 100);
     }
     lifeAccMs = 0;
   }
