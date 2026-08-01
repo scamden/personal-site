@@ -43,16 +43,6 @@ export type EngineInputs = {
 const FIELD_COLS = 400;
 const FIELD_CELL = 18;
 
-// The plasma's three waves are tied to absolute row/col, so the texture looks
-// the same however big the field is — which makes "60M cells" a claim you can't
-// see. This fourth wave spans the grid instead: BANDS colour regimes from top to
-// bottom, whatever the total. Local motion while scrolling is untouched; what
-// changes is how long a regime lasts. At 5k rows you cross one every ~13
-// screens; at 150k rows you can fling for a long time without leaving one.
-const BANDS = 8;
-const BAND_WEIGHT = 1.2;
-const TAU = Math.PI * 2;
-
 // --- life torus ---
 const LIFE_H = 220;
 const LIFE_W = 220;
@@ -431,10 +421,8 @@ export async function createGridEngine(
     const v =
       Math.sin(r * 0.06 + time) +
       Math.sin(c * 0.06 + time * 0.9) +
-      Math.sin((r + c) * 0.045 + time * 0.5) +
-      BAND_WEIGHT * Math.sin((r / fieldRows) * BANDS * TAU);
-    const span = 2 * (3 + BAND_WEIGHT); // v runs +/- one per wave, weights included
-    return UNIVERSE_PALETTE[clampIndex(((v / span + 0.5) * PALETTE_N) | 0, PALETTE_N)] ?? '#000';
+      Math.sin((r + c) * 0.045 + time * 0.5);
+    return UNIVERSE_PALETTE[clampIndex(((v / 6 + 0.5) * PALETTE_N) | 0, PALETTE_N)] ?? '#000';
   }
   function teardown() {
     if (grid) grid.destroy();
