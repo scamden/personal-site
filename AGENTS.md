@@ -12,6 +12,12 @@ TypeScript, Biome. One quiet single page today; room to grow into podcast/writin
 - `src/components/` — reusable components (kebab-case files, named exports).
 - `src/styles.css` — the whole design system as CSS custom properties (`--paper`, `--ink`,
   `--accent`, …) with light + dark token sets. Style through the tokens; never hardcode colors.
+- `src/grid-demo/` — the `/grid` demo's imperative engine (browser-only, dynamically imported so
+  the `grid` library never runs during SSR) and its CSS. The library keeps per-cell state in two
+  places that scale with *total* cells, not visible ones: `simple-grid` seeds the data model with an
+  object per cell, and cell classes are cached per cell of the virtual grid. Both are fatal in the
+  millions, so the field grid is built on `modules/core` directly, with no default cell classes and
+  arithmetic (not per-row walked) pixel geometry. Keep new field-grid work O(visible).
 - `assets/og-card.svg` — source for the social share image. It's the design tokens in raw SVG.
   Edit it, then regenerate the served PNG:
   `rsvg-convert -w 1200 -h 630 assets/og-card.svg -o public/og.png`. Keep the colors in sync with
