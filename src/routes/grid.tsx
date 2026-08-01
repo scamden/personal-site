@@ -31,19 +31,20 @@ const SIZES: { value: number; label: string }[] = [
   { value: 40_000, label: '16M cells' },
   { value: 150_000, label: '60M cells' },
 ];
-// A frame costs one style write per cell on screen, and the cells on screen are
-// viewport area / cell² — so the window decides what the demo can afford, and
-// the total size does not. Measured Life steps (a step is due every 90ms):
+// A frame's cost follows the cells on screen, which is viewport area / cell² —
+// the window decides what the demo can afford, and the total size does not.
 //
-//   375x812   9px    3,956 cells    37ms
-//   1280x800  9px   12,960 cells   115ms
-//   1728x1000 18px   5,586 cells    40ms
-//   1728x1000 9px   21,922 cells   186ms   <- never keeps up
-//   2560x1400 18px  11,376 cells    98ms   <- a 5K screen is over budget at 1x
+// Most of that cost is not in our JS. Writing the styles for a step is ~26ms at
+// 21,922 cells; the rest is the browser's style, layout and paint over that many
+// nodes, which no timer here can see. Changing the zoom is worse: the library
+// rebuilds its element pool, which is every column times the visible rows, so
+// 21,922 visible cells churn 45,200 elements — a second of work before anything
+// moves again.
 //
-// So cells on screen are capped, and the cell size follows from the window
-// rather than being fixed. A phone keeps 2x; a 16" loses it; a 5K starts coarser.
-const CELL_BUDGET = 7_000;
+// The budget below is therefore a taste call about how slow is too slow, not a
+// hard limit. At 24,000 a phone and a 16" keep 2x (21,922 cells, visibly slower
+// but usable); a 5K screen at 2x asks for 44,902 and doesn't get it.
+const CELL_BUDGET = 24_000;
 const CELL_STEPS = [18, 24, 36]; // px, finest first
 const FALLBACK_CELL = 36;
 
