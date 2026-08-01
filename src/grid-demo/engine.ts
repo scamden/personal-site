@@ -37,6 +37,7 @@ export type EngineInputs = {
   getPattern: () => LifePattern;
   getResetNonce: () => number;
   getFieldRows: () => number; // "crank it up" — total field cells = rows * FIELD_COLS
+  getLifeCell: () => number; // Life's zoom, in px per cell
 };
 
 // --- field geometry (universe + life) ---
@@ -301,12 +302,22 @@ export async function createGridEngine(
   container: HTMLElement,
   inputs: EngineInputs,
 ): Promise<GridEngine> {
-  const { getMode, getPattern, getResetNonce, getFieldRows } = inputs;
+  const { getMode, getPattern, getResetNonce, getFieldRows, getLifeCell } = inputs;
 
   let grid: Grid | null = null;
   let layout: 'field' | 'data' | null = null;
   let total = 0;
   let fieldRows = getFieldRows();
+  let fieldCell = FIELD_CELL;
+
+  // Only Life zooms. The plasma computes a distinct colour per cell per frame,
+  // so shrinking its cells multiplies the most expensive thing the demo does;
+  // Life writes one of two colours and only when the board steps, which is
+  // cheap enough to spend on seeing more of the board at once.
+  function cellSizeFor(next: GridMode): number {
+    return next === 'life' ? getLifeCell() : FIELD_CELL;
+  }
+
   let mode: GridMode = getMode();
   let isDark = currentIsDark();
   let time = 0;
@@ -461,10 +472,11 @@ export async function createGridEngine(
     // builder paints from the row/col index — so the grid only needs row and
     // column descriptors, sized uniformly through defaultSize.
     const g = makeGrid({ snapToCell: false, allowEdit: false });
-    g.rowModel.defaultSize = FIELD_CELL;
-    g.colModel.defaultSize = FIELD_CELL;
+    fieldCell = cellSizeFor(getMode());
+    g.rowModel.defaultSize = fieldCell;
+    g.colModel.defaultSize = fieldCell;
     dropDefaultCellClasses(g);
-    applyUniformCellGeometry(g, FIELD_CELL);
+    applyUniformCellGeometry(g, fieldCell);
     const builder = g.colModel.createBuilder(
       () => {
         const el = document.createElement('div');
@@ -609,6 +621,9 @@ export async function createGridEngine(
       const size = getFieldRows();
       if (size !== fieldRows) {
         fieldRows = size;
+        buildFieldGrid();
+      } else if (cellSizeFor(mode) !== fieldCell) {
+        // zoom changed, or we left Life with a zoom applied
         buildFieldGrid();
       }
     }

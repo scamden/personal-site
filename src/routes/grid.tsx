@@ -31,6 +31,13 @@ const SIZES: { value: number; label: string }[] = [
   { value: 40_000, label: '16M cells' },
   { value: 150_000, label: '60M cells' },
 ];
+// px per cell, Life only. Every step repaints every visible cell, so zooming out
+// buys board at the cost of paint: 9px is ~4x the cells of 18px.
+const ZOOMS: { value: number; label: string }[] = [
+  { value: 18, label: 'Close' },
+  { value: 12, label: 'Wider' },
+  { value: 9, label: 'Widest' },
+];
 
 function subtitleFor(mode: GridMode): string {
   return mode === 'data'
@@ -50,10 +57,12 @@ function GridDemo() {
   const patternRef = useRef<LifePattern>('soup');
   const resetRef = useRef(0);
   const sizeRef = useRef(SIZES[0]?.value ?? 5_000);
+  const zoomRef = useRef(ZOOMS[0]?.value ?? 18);
 
   const [mode, setMode] = useState<GridMode>(initialMode);
   const [pattern, setPattern] = useState<LifePattern>('soup');
   const [size, setSize] = useState(sizeRef.current);
+  const [zoom, setZoom] = useState(zoomRef.current);
   const [stats, setStats] = useState<GridStats | null>(null);
 
   useEffect(() => {
@@ -71,6 +80,7 @@ function GridDemo() {
           getPattern: () => patternRef.current,
           getResetNonce: () => resetRef.current,
           getFieldRows: () => sizeRef.current,
+          getLifeCell: () => zoomRef.current,
         }).then((engine) => {
           if (cancelled) {
             engine.destroy();
@@ -106,6 +116,10 @@ function GridDemo() {
   const handleSize = (next: number) => {
     sizeRef.current = next;
     setSize(next);
+  };
+  const handleZoom = (next: number) => {
+    zoomRef.current = next;
+    setZoom(next);
   };
   const handleReset = () => {
     resetRef.current += 1;
@@ -157,6 +171,18 @@ function GridDemo() {
                       {PATTERNS.map((p) => (
                         <option key={p.value} value={p.value}>
                           {p.label}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      className="griddemo-select"
+                      value={zoom}
+                      onChange={(e) => handleZoom(Number(e.target.value))}
+                      aria-label="Zoom"
+                    >
+                      {ZOOMS.map((z) => (
+                        <option key={z.value} value={z.value}>
+                          {z.label}
                         </option>
                       ))}
                     </select>
