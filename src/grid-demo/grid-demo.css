@@ -266,10 +266,15 @@
   outline-offset: 2px;
 }
 
-/* make the library's scroll bar visible on both dark field and light table */
+/* The thumb is the honest picture of how much grid there is: it shrinks as the
+   total grows, down to a few pixels at 60M. Worth reading clearly, so it gets
+   the ink color and a paper-colored ring to hold contrast over the vivid field
+   as well as the light table. */
 .griddemo .grid-scroll-bar {
-  background: rgba(150, 162, 172, 0.72);
+  background: var(--ink);
   border-radius: 6px;
+  box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--paper) 70%, transparent);
+  opacity: 0.62;
 }
 
 /* On touch-only devices the drag-driven interactions (column resize/reorder,

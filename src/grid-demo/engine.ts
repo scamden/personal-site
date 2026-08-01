@@ -21,7 +21,15 @@ import 'grid/dist/css.css';
 
 export type GridMode = 'universe' | 'life' | 'data';
 export type LifePattern = 'soup' | 'gliders' | 'gun' | 'pulsars' | 'rpentomino';
-export type GridStats = { fps: number; visible: number; total: number; mode: GridMode };
+export type GridStats = {
+  fps: number;
+  visible: number;
+  total: number;
+  mode: GridMode;
+  // where you are: the top row in view, and how many there are to reach
+  row: number;
+  rows: number;
+};
 export type GridEngine = { stats: () => GridStats; destroy: () => void };
 
 export type EngineInputs = {
@@ -315,6 +323,15 @@ export async function createGridEngine(
   // count, not a tally we keep in step with it.
   function visibleCells(): number {
     return grid ? grid.viewPort.rows * grid.viewPort.cols : 0;
+  }
+  // The data grid's row 0 is the frozen header, so the first data row is 1.
+  function topRow(): number {
+    if (!grid) return 0;
+    const scrolled = grid.cellScrollModel.row;
+    return layout === 'data' ? scrolled : scrolled + 1;
+  }
+  function totalRows(): number {
+    return layout === 'data' ? DATA_ROWS : fieldRows;
   }
 
   // Life state
@@ -610,7 +627,14 @@ export async function createGridEngine(
   raf = requestAnimationFrame(frame);
 
   return {
-    stats: () => ({ fps, visible: visibleCells(), total, mode }),
+    stats: () => ({
+      fps,
+      visible: visibleCells(),
+      total,
+      mode,
+      row: topRow(),
+      rows: totalRows(),
+    }),
     destroy: () => {
       cancelAnimationFrame(raf);
       teardown();
