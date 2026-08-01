@@ -138,12 +138,12 @@ export const site = {
       ],
       links: [
         {
-          title: 'this one is',
+          title: 'Sterling Camden · this one is',
           meta: 'Newer',
           href: 'https://soundcloud.com/sterling-camden-261510100/sets/this-one-is',
         },
         {
-          title: 'this is not a christian rock album',
+          title: 'Sterling Camden · this is not a christian rock album',
           meta: 'Older, drunker songs',
           href: 'https://soundcloud.com/sterling-camden-261510100/sets/this-is-not-a-christian-rock-album',
         },
