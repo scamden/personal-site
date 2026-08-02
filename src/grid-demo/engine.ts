@@ -503,7 +503,13 @@ export async function createGridEngine(
     dropDefaultCellClasses(g);
     applyUniformCellGeometry(g, fieldCell);
     const builder = g.colModel.createBuilder(
-      () => {
+      (ctx) => {
+        // Take the element the library already has for this slot. It rebuilds
+        // the whole pool — every column times the visible rows — whenever the
+        // viewport changes, so zooming out otherwise drops ~23k elements and
+        // allocates ~45k. Collecting that costs seconds of frozen main thread,
+        // after the new size has already painted.
+        if (ctx.previousElement) return ctx.previousElement;
         const el = document.createElement('div');
         el.style.cssText = 'position:absolute;inset:0';
         return el;
