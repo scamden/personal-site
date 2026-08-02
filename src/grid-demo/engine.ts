@@ -109,6 +109,20 @@ function layoutFor(mode: GridMode): 'field' | 'data' {
 // tab. The field grid has no headers, no fixed rows or columns, and paints its
 // own cells, so none of those defaults apply to it. (The data grid keeps them:
 // 380k entries there, and its cells do use the library's classes.)
+// The grid keeps a hidden textarea to hold focus and catch paste. It is the only
+// form field on the page, which is enough for a password manager to adopt the
+// page and then re-scan the DOM every time it changes — and this demo changes
+// tens of thousands of nodes at a time. These are their documented opt-outs.
+// (No aria-hidden: the textarea is focusable, and hiding a focusable element
+// from the accessibility tree is worse than the scanning.)
+function ignoreForAutofill(textarea: HTMLTextAreaElement) {
+  textarea.setAttribute('data-1p-ignore', 'true'); // 1Password
+  textarea.setAttribute('data-lpignore', 'true'); // LastPass
+  textarea.setAttribute('data-bwignore', 'true'); // Bitwarden
+  textarea.setAttribute('data-form-type', 'other'); // Dashlane
+  textarea.setAttribute('autocomplete', 'off');
+}
+
 function dropDefaultCellClasses(g: Grid) {
   for (const descriptor of g.cellClasses.getAll()) g.cellClasses.remove(descriptor);
   // With no classes left to apply, the draw's class pass still walks every
@@ -497,6 +511,7 @@ export async function createGridEngine(
     // builder paints from the row/col index — so the grid only needs row and
     // column descriptors, sized uniformly through defaultSize.
     const g = makeGrid({ snapToCell: false, allowEdit: false });
+    ignoreForAutofill(g.textarea);
     fieldCell = getCellSize();
     g.rowModel.defaultSize = fieldCell;
     g.colModel.defaultSize = fieldCell;
@@ -557,6 +572,7 @@ export async function createGridEngine(
         allowEdit: false,
       },
     );
+    ignoreForAutofill(g.textarea);
     const cellBuilder = g.colModel.createBuilder(
       () => {
         const el = document.createElement('div');
