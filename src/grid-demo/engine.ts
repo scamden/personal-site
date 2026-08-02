@@ -29,6 +29,9 @@ export type GridStats = {
   // where you are: the top row in view, and how many there are to reach
   row: number;
   rows: number;
+  // the geometry the engine actually has right now, which lags the controls
+  // while a rebuild is in flight
+  cell: number;
 };
 export type GridEngine = { stats: () => GridStats; destroy: () => void };
 
@@ -37,11 +40,13 @@ export type EngineInputs = {
   getPattern: () => LifePattern;
   getResetNonce: () => number;
   getFieldRows: () => number; // "crank it up" — total field cells = rows * FIELD_COLS
+  getCellSize: () => number; // px per field cell; the route decides what the window can afford
 };
 
 // --- field geometry (universe + life) ---
+// Cell size is the route's call: it is what decides how many cells land on
+// screen, and so what a frame costs.
 const FIELD_COLS = 400;
-const FIELD_CELL = 18;
 
 // --- life torus ---
 const LIFE_H = 220;
@@ -104,8 +109,26 @@ function layoutFor(mode: GridMode): 'field' | 'data' {
 // tab. The field grid has no headers, no fixed rows or columns, and paints its
 // own cells, so none of those defaults apply to it. (The data grid keeps them:
 // 380k entries there, and its cells do use the library's classes.)
+// The grid keeps a hidden textarea to hold focus and catch paste. It is the only
+// form field on the page, which is enough for a password manager to adopt the
+// page and then re-scan the DOM every time it changes — and this demo changes
+// tens of thousands of nodes at a time. These are their documented opt-outs.
+// (No aria-hidden: the textarea is focusable, and hiding a focusable element
+// from the accessibility tree is worse than the scanning.)
+function ignoreForAutofill(textarea: HTMLTextAreaElement) {
+  textarea.setAttribute('data-1p-ignore', 'true'); // 1Password
+  textarea.setAttribute('data-lpignore', 'true'); // LastPass
+  textarea.setAttribute('data-bwignore', 'true'); // Bitwarden
+  textarea.setAttribute('data-form-type', 'other'); // Dashlane
+  textarea.setAttribute('autocomplete', 'off');
+}
+
 function dropDefaultCellClasses(g: Grid) {
   for (const descriptor of g.cellClasses.getAll()) g.cellClasses.remove(descriptor);
+  // With no classes left to apply, the draw's class pass still walks every
+  // visible cell to join an empty list onto it — 2.3ms per scroll frame at
+  // 3,358 cells, and scrolling is when it runs.
+  g.viewLayer._drawCellClasses = () => {};
 }
 
 // Every field cell is the same size, so pixel <-> cell conversion is division.
@@ -301,12 +324,38 @@ export async function createGridEngine(
   container: HTMLElement,
   inputs: EngineInputs,
 ): Promise<GridEngine> {
-  const { getMode, getPattern, getResetNonce, getFieldRows } = inputs;
+  const { getMode, getPattern, getResetNonce, getFieldRows, getCellSize } = inputs;
 
   let grid: Grid | null = null;
   let layout: 'field' | 'data' | null = null;
   let total = 0;
   let fieldRows = getFieldRows();
+  let fieldCell = getCellSize();
+  // Rebuilding the field blocks for long enough at the bigger sizes to look like
+  // a hang, so a geometry change waits one frame before it runs. That frame is
+  // what lets the route paint "building the grid…" first.
+  let pendingGeometry: { rows: number; cell: number } | null = null;
+  // Zoom without rebuilding: the rows, the columns and the grid itself are all
+  // still correct, only their size changed. Rebuilding threw away 150k
+  // descriptors and, worse, your scroll position — you zoomed out to see more of
+  // what you were watching and got dropped back at the origin.
+  function applyZoom(cell: number) {
+    if (!grid || layout !== 'field') return;
+    // hold whatever is in the middle of the screen in the middle, the way a map
+    // zooms — and it keeps the view full when zooming out near an edge
+    const centerRow = grid.cellScrollModel.row + (grid.viewPort.rows >> 1);
+    const centerCol = grid.cellScrollModel.col + (grid.viewPort.cols >> 1);
+    fieldCell = cell;
+    grid.rowModel.defaultSize = cell;
+    grid.colModel.defaultSize = cell;
+    applyUniformCellGeometry(grid, cell);
+    grid.viewPort._resize(); // re-measure the container against the new cell size
+    grid.cellScrollModel.scrollTo(
+      Math.max(0, centerRow - (grid.viewPort.rows >> 1)),
+      Math.max(0, centerCol - (grid.viewPort.cols >> 1)),
+    );
+    requestRepaint();
+  }
 
   let mode: GridMode = getMode();
   let isDark = currentIsDark();
@@ -347,8 +396,32 @@ export async function createGridEngine(
   function stamp(cells: number[][], row: number, col: number) {
     for (const cell of cells) board[idx(row + (cell[0] ?? 0), col + (cell[1] ?? 0))] = 1;
   }
+  // The board is a torus tiled across the field, so a fixed board coordinate can
+  // sit anywhere relative to what you're looking at — the R-pentomino lived at
+  // the board's centre and started off screen every time. Patterns are stamped
+  // around the middle of the view instead, which is clear of the overlay bars at
+  // any size, so seeding (and Reset) always puts the action in front of you.
+  function viewCenter(): { r: number; c: number } {
+    if (!grid) return { r: 0, c: 0 };
+    return {
+      r: grid.cellScrollModel.row + (grid.viewPort.rows >> 1),
+      c: grid.cellScrollModel.col + (grid.viewPort.cols >> 1),
+    };
+  }
+  // Stamp a pattern about its own middle, so what lands on screen is the whole
+  // shape rather than its top-left corner.
+  function stampCentered(cells: number[][], row: number, col: number) {
+    let height = 0;
+    let width = 0;
+    for (const cell of cells) {
+      height = Math.max(height, cell[0] ?? 0);
+      width = Math.max(width, cell[1] ?? 0);
+    }
+    stamp(cells, row - (height >> 1), col - (width >> 1));
+  }
   function seedLife(pattern: LifePattern) {
     board.fill(0);
+    const { r: anchorRow, c: anchorCol } = viewCenter();
     if (pattern === 'soup') {
       for (let i = 0; i < board.length; i++) board[i] = Math.random() < 0.32 ? 1 : 0;
     } else if (pattern === 'gliders') {
@@ -359,10 +432,10 @@ export async function createGridEngine(
         [2, 1],
         [2, 2],
       ];
-      for (let r = 6; r < LIFE_H - 6; r += 26)
-        for (let c = 6; c < LIFE_W - 6; c += 26) stamp(g, r, c);
+      for (let r = 0; r < LIFE_H; r += 26)
+        for (let c = 0; c < LIFE_W; c += 26) stamp(g, anchorRow + r, anchorCol + c);
     } else if (pattern === 'rpentomino') {
-      stamp(
+      stampCentered(
         [
           [0, 1],
           [0, 2],
@@ -370,17 +443,17 @@ export async function createGridEngine(
           [1, 1],
           [2, 1],
         ],
-        (LIFE_H >> 1) - 1,
-        (LIFE_W >> 1) - 1,
+        anchorRow,
+        anchorCol,
       );
     } else if (pattern === 'pulsars') {
       const p = pulsarCells();
-      stamp(p, 40, 40);
-      stamp(p, 40, 140);
-      stamp(p, 140, 90);
+      stampCentered(p, anchorRow, anchorCol);
+      stampCentered(p, anchorRow + 20, anchorCol + 20);
+      stampCentered(p, anchorRow + 100, anchorCol + 50);
     } else {
-      stamp(gosperGun(), 20, 20);
-      stamp(gosperGun(), 120, 120);
+      stampCentered(gosperGun(), anchorRow, anchorCol);
+      stampCentered(gosperGun(), anchorRow + 100, anchorCol + 100);
     }
     lifeAccMs = 0;
   }
@@ -438,12 +511,20 @@ export async function createGridEngine(
     // builder paints from the row/col index — so the grid only needs row and
     // column descriptors, sized uniformly through defaultSize.
     const g = makeGrid({ snapToCell: false, allowEdit: false });
-    g.rowModel.defaultSize = FIELD_CELL;
-    g.colModel.defaultSize = FIELD_CELL;
+    ignoreForAutofill(g.textarea);
+    fieldCell = getCellSize();
+    g.rowModel.defaultSize = fieldCell;
+    g.colModel.defaultSize = fieldCell;
     dropDefaultCellClasses(g);
-    applyUniformCellGeometry(g, FIELD_CELL);
+    applyUniformCellGeometry(g, fieldCell);
     const builder = g.colModel.createBuilder(
-      () => {
+      (ctx) => {
+        // Take the element the library already has for this slot. It rebuilds
+        // the whole pool — every column times the visible rows — whenever the
+        // viewport changes, so zooming out otherwise drops ~23k elements and
+        // allocates ~45k. Collecting that costs seconds of frozen main thread,
+        // after the new size has already painted.
+        if (ctx.previousElement) return ctx.previousElement;
         const el = document.createElement('div');
         el.style.cssText = 'position:absolute;inset:0';
         return el;
@@ -491,6 +572,7 @@ export async function createGridEngine(
         allowEdit: false,
       },
     );
+    ignoreForAutofill(g.textarea);
     const cellBuilder = g.colModel.createBuilder(
       () => {
         const el = document.createElement('div');
@@ -583,10 +665,20 @@ export async function createGridEngine(
     mode = next;
 
     if (layout === 'field') {
-      const size = getFieldRows();
-      if (size !== fieldRows) {
-        fieldRows = size;
-        buildFieldGrid();
+      if (pendingGeometry) {
+        const { rows, cell } = pendingGeometry;
+        pendingGeometry = null;
+        if (rows !== fieldRows) {
+          fieldRows = rows; // buildFieldGrid picks the cell size up from getCellSize
+          buildFieldGrid();
+        } else if (cell !== fieldCell) {
+          applyZoom(cell);
+        }
+      } else {
+        const rows = getFieldRows();
+        const cell = getCellSize();
+        // announce the change now, do it next frame, so the readout can say so
+        if (rows !== fieldRows || cell !== fieldCell) pendingGeometry = { rows, cell };
       }
     }
 
@@ -634,6 +726,7 @@ export async function createGridEngine(
       mode,
       row: topRow(),
       rows: totalRows(),
+      cell: fieldCell,
     }),
     destroy: () => {
       cancelAnimationFrame(raf);
