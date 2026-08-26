@@ -96,11 +96,6 @@ export const site = {
             'A hand-built, test-first virtualized grid core from when a fast grid meant fighting the browsers of the day. It quietly powered RelateIQ, CreditIQ, and Airkit.',
         },
         {
-          title: 'Grid 3.0 · Dreamforce 2015',
-          meta: 'Watch the talk',
-          href: 'https://youtu.be/dFJJppeWvlU',
-        },
-        {
           title: 'react-ts-form',
           meta: 'Core contributor',
           href: 'https://github.com/iway1/react-ts-form',
