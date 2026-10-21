@@ -241,12 +241,48 @@ function Home() {
                 <section className="sec reveal d2" key={section.label}>
                   <h2 className="lbl">{section.label}</h2>
                   <div>
+                    {section.podcast ? (
+                      <section className="podcast" aria-label={section.podcast.title}>
+                        <p className="body">
+                          {section.podcast.introduction}{' '}
+                          <a
+                            className="podcast-title-link"
+                            href={section.podcast.href}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {section.podcast.title}
+                          </a>
+                          , {section.podcast.description}
+                        </p>
+                        <iframe
+                          className="podcast-player"
+                          src={section.podcast.playlistEmbed}
+                          title={`${section.podcast.title} playlist`}
+                          width="636"
+                          height="358"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          allowFullScreen
+                        />
+                        <a
+                          className="feature-see"
+                          href={section.podcast.href}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {section.podcast.action}{' '}
+                          <span className="arw" aria-hidden="true">
+                            ↗
+                          </span>
+                        </a>
+                      </section>
+                    ) : null}
                     {section.body.map((paragraph) => (
                       <p className="body" key={paragraph.slice(0, 32)}>
                         {renderProse(paragraph)}
                       </p>
                     ))}
-                    {section.note ? <p className="body note">{section.note}</p> : null}
                     {featured.map((link) => (
                       <FeatureCard key={link.title} link={link} />
                     ))}

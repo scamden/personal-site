@@ -161,10 +161,6 @@ a {
   color: var(--accent);
   border-color: var(--accent);
 }
-.note {
-  font-size: 15px;
-  color: var(--muted);
-}
 
 /* small lead-in above a resource list */
 .links-intro {
@@ -344,6 +340,39 @@ a {
 .feature-src:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
+}
+
+/* ---- podcast ---- */
+.podcast {
+  margin: 0 0 32px;
+  display: grid;
+  gap: 16px;
+}
+.podcast > .body {
+  margin: 0;
+}
+.podcast > .feature-see {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  gap: 6px;
+}
+.podcast-title-link:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--muted);
+  text-underline-offset: 0.15em;
+}
+.podcast-title-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.podcast-player {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 200px;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--hair);
 }
 
 /* ---- photo plate ---- */
