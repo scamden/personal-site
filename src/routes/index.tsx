@@ -257,8 +257,8 @@ function Home() {
                         </p>
                         <iframe
                           className="podcast-player"
-                          src={section.podcast.playlistEmbed}
-                          title={`${section.podcast.title} playlist`}
+                          src={section.podcast.videoEmbed}
+                          title={`${section.podcast.title} featured video`}
                           width="636"
                           height="358"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

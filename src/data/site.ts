@@ -21,7 +21,7 @@ export type Section = {
     introduction: string;
     description: string;
     href: string;
-    playlistEmbed: string;
+    videoEmbed: string;
     action: string;
   };
   body: string[];
@@ -55,7 +55,7 @@ export const site = {
         description:
           'where I test beliefs we take for granted and explore those we dismiss too soon.',
         href: 'https://www.youtube.com/@suspended_belief',
-        playlistEmbed: 'https://www.youtube-nocookie.com/embed/videoseries?list=PLarStij8lijo',
+        videoEmbed: 'https://www.youtube-nocookie.com/embed/qzbIGgzZ21Y',
         action: 'Watch on YouTube',
       },
       body: [
