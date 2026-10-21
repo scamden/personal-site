@@ -16,8 +16,15 @@ export type ResourceLink = {
 };
 export type Section = {
   label: string;
+  podcast?: {
+    title: string;
+    introduction: string;
+    description: string;
+    href: string;
+    playlistEmbed: string;
+    action: string;
+  };
   body: string[];
-  note?: string;
   linksIntro?: string;
   links?: ResourceLink[];
 };
@@ -42,6 +49,15 @@ export const site = {
   sections: [
     {
       label: 'Thinking',
+      podcast: {
+        title: 'suspended belief',
+        introduction: 'I’ve started a podcast,',
+        description:
+          'where I test beliefs we take for granted and explore those we dismiss too soon.',
+        href: 'https://www.youtube.com/@suspended_belief',
+        playlistEmbed: 'https://www.youtube-nocookie.com/embed/videoseries?list=PLarStij8lijo',
+        action: 'Watch on YouTube',
+      },
       body: [
         // thesis first, then the story, then what I'm chewing on now.
         'A former atheist who came to faith as an adult, now trying to get precise about it. Truth over tribe, possibility over certainty. I’d rather hold the hard questions honestly than reach for tidy answers.',
@@ -49,7 +65,6 @@ export const site = {
         'That was nineteen years ago, and apart from one disastrous nine-month experiment two years in, I’ve been sober ever since. Slowly, I started seeing God in everything, from the wind to song lyrics. Eventually I went all in on Jesus, but that’s another story.',
         'Lately I’m chewing on consciousness, the limits of logic, and what actually sits at the truest core of my Christian experience.',
       ],
-      note: 'A podcast about all this is coming. It’ll live here first.',
       linksIntro: 'A few voices I keep coming back to:',
       links: [
         {
@@ -195,6 +210,7 @@ export const site = {
 
   social: [
     { label: 'Email', href: 'mailto:hello@sterlingcamden.com' },
+    { label: 'YouTube', href: 'https://www.youtube.com/@suspended_belief' },
     { label: 'GitHub', href: 'https://github.com/scamden' },
     { label: 'LinkedIn', href: 'https://linkedin.com/in/scamden' },
   ],
