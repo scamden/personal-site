@@ -55,7 +55,7 @@ export const site = {
         description:
           'where I test beliefs we take for granted and explore those we dismiss too soon.',
         href: 'https://www.youtube.com/@suspended_belief',
-        videoEmbed: 'https://www.youtube-nocookie.com/embed/qzbIGgzZ21Y',
+        videoEmbed: 'https://www.youtube-nocookie.com/embed/qzbIGgzZ21Y?list=PLarStij8lijo&index=1',
         action: 'Watch on YouTube',
       },
       body: [
